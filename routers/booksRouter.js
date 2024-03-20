@@ -8,7 +8,7 @@ class BooksRouter {
 
   routes() {
     router.get("/", this.controller.getAll.bind(this.controller));
-    // router.post("/", this.controller.insertBook.bind(this.controller));
+    router.post("/", this.controller.insertBook.bind(this.controller));
     return router;
   }
 }
