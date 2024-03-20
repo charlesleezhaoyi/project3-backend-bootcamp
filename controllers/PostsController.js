@@ -9,6 +9,8 @@ class PostsController {
 
   //get one post data using postId, can include comment,author,like.
   //Input: authorId (from params)
+  //Optional Input: comment:any, like:any, author:any (from query)
+  //Output: postData (optional:comments, likes, author)
   async getOne(req, res) {
     const { postId } = req.params;
     if (isNaN(Number(postId))) {
@@ -34,8 +36,9 @@ class PostsController {
   }
 
   //create Data and add relationship with category
-  //Input: authorId:number, categories:string[], title:string, content:string (from req.body), output:void
-  async createOne(req, res) {
+  //Input: authorId:number, categories:string[], title:string, content:string (from body)
+  //Output: void
+  async createPost(req, res) {
     const { categories, ...data } = req.body;
     if (isNaN(Number(data.authorId))) {
       return res.status(400).send("Wrong Type of authorId");
@@ -57,7 +60,37 @@ class PostsController {
         });
         await newPost.addCategory(categoryInstance);
       }
-      return res.send("Create Completed");
+      return res.send("Create Post Completed");
+    } catch (err) {
+      return res.status(400).send(err);
+    }
+  }
+
+  //Input: postId (from params)
+  //Input: userId:number, content:string (from body)
+  //Output: void
+  async createComment(req, res) {
+    const { postId } = req.params;
+    if (isNaN(Number(postId))) {
+      return res.status(400).send("Wrong Type of postId");
+    }
+    const data = req.body;
+    if (isNaN(Number(data.userId))) {
+      return res.status(400).send("Wrong Type of userId");
+    }
+    if (typeof data.content !== "string") {
+      return res.status(400).send("Wrong Type of content");
+    }
+    if (!data.content.length) {
+      return res.status(400).send("Must have content for content");
+    }
+    try {
+      const postData = await this.post.findByPk(postId);
+      if (!postData) {
+        throw new Error("No Such Post Found.");
+      }
+      await postData.createComment(data);
+      return res.json("Create Comment Completed");
     } catch (err) {
       return res.status(400).send(err);
     }

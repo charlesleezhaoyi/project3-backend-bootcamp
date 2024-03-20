@@ -8,7 +8,11 @@ class PostsRouter {
 
   routes() {
     router.get("/:postId", this.controller.getOne.bind(this.controller));
-    router.post("/", this.controller.createOne.bind(this.controller));
+    router.post("/", this.controller.createPost.bind(this.controller));
+    router.post(
+      "/:postId/comments/",
+      this.controller.createComment.bind(this.controller)
+    );
     return router;
   }
 }
