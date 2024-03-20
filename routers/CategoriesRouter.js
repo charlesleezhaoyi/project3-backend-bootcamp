@@ -7,6 +7,7 @@ class CategoriesRouter {
   }
 
   routes() {
+    router.get("/all", this.controller.getAll.bind(this.controller));
     return router;
   }
 }

@@ -10,7 +10,7 @@ const CategoriesRouter = require("./routers/CategoriesRouter");
 // importing Controllers
 const UsersController = require("./controllers/usersController");
 const PostsController = require("./controllers/PostsController");
-const CategoriesController = require("./controllers/PostsController");
+const CategoriesController = require("./controllers/CategoriesController");
 
 //importing DB
 const db = require("./db/models/index");
