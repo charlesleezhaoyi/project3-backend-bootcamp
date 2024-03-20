@@ -6,7 +6,7 @@ class BooksController extends BaseController {
   }
 
   async insertBook(req, res) {
-    const { title, author, description, released_year, condition, review } =
+    const { title, author, description, releasedYear, condition, review } =
       req.body;
 
     try {
@@ -14,7 +14,7 @@ class BooksController extends BaseController {
         title: title,
         author: author,
         description: description,
-        released_year: released_year,
+        releasedYear: releasedYear,
         condition: condition,
         review: review,
       });
