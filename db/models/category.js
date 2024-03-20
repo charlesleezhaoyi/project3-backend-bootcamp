@@ -10,7 +10,8 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.belongsToMany(models.user, { through: "user_categories" });
-      this.belongsToMany(models.book, {through:"category_books"})
+      this.belongsToMany(models.book, { through: "category_books" });
+      this.belongsToMany(models.post, { through: "category_posts" });
     }
   }
   category.init(

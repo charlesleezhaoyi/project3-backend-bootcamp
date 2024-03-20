@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       this.belongsToMany(models.category, { through: "category_books" });
       this.hasMany(models.photo);
-      this.hasMany(models.donation);
+      this.belongsToMany(models.user, { through: models.donation });
     }
   }
   book.init(
@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
       title: DataTypes.STRING,
       author: DataTypes.STRING,
       description: DataTypes.TEXT,
-      released_year: DataTypes.INTEGER,
+      releasedYear: DataTypes.INTEGER,
       condition: DataTypes.STRING,
       review: DataTypes.TEXT,
     },

@@ -14,14 +14,14 @@ module.exports = (sequelize, DataTypes) => {
   }
   request.init(
     {
-      donation_id: {
+      donationId: {
         type: DataTypes.INTEGER,
         referneces: {
           model: "donation",
           key: "id",
         },
       },
-      bene_id: {
+      beneId: {
         type: DataTypes.INTEGER,
         references: {
           model: "user",
@@ -30,7 +30,13 @@ module.exports = (sequelize, DataTypes) => {
       },
 
       content: DataTypes.TEXT,
-      status: DataTypes.ENUM("pending"),
+      status: DataTypes.ENUM([
+        "pending",
+        "accepted",
+        "rejected",
+        "cancelled",
+        "collected",
+      ]),
     },
     {
       sequelize,

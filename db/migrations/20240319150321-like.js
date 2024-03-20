@@ -1,26 +1,34 @@
 "use strict";
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("photos", {
+    /**
+     * Add altering commands here.
+     *
+     * Example:
+     * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
+     */
+    await queryInterface.createTable("likes", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      photo_url: {
-        type: Sequelize.STRING,
-      },
-      book_id: {
+      user_id: {
         type: Sequelize.INTEGER,
         references: {
-          model: "books",
+          model: "users",
           key: "id",
         },
       },
-      index: {
+      post_id: {
         type: Sequelize.INTEGER,
+        references: {
+          model: "posts",
+          key: "id",
+        },
       },
       created_at: {
         allowNull: false,
@@ -32,7 +40,14 @@ module.exports = {
       },
     });
   },
+
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("photos");
+    /**
+     * Add reverting commands here.
+     *
+     * Example:
+     * await queryInterface.dropTable('users');
+     */
+    await queryInterface.dropTable("likes");
   },
 };
