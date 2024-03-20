@@ -14,11 +14,11 @@ const CategoriesController = require("./controllers/CategoriesController");
 
 //importing DB
 const db = require("./db/models/index");
-const { user, post, comment, category } = db;
+const { user, category } = db;
 
 // Initializing Controllers
 const userController = new UsersController(user);
-const postsController = new PostsController(post, comment);
+const postsController = new PostsController(db);
 const categoriesController = new CategoriesController(category);
 
 // Initializing Routers
