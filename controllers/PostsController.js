@@ -1,5 +1,3 @@
-const { Op } = require("sequelize");
-
 class PostsController {
   constructor(db) {
     this.post = db.post;
@@ -75,16 +73,20 @@ class PostsController {
       return res.status(400).send("Wrong Type of userId");
     }
     try {
-      const like = await this.like.findOne({
-        where: { [Op.and]: [{ userId: userId }, { postId: postId }] },
-      });
-      if (like) {
-        await like.destroy();
-      } else {
-        await this.like.create(req.body);
+      const post = await this.post.findByPk(postId);
+      if (!post) {
+        throw new Error("No Such Post Found");
       }
+      const user = await this.user.findByPk(userId);
+      if (!post) {
+        throw new Error("No Such User Found");
+      }
+      const isUserLikedPost = await post.hasLiker(user);
+      await post.setLiker(isUserLikedPost ? [] : [user]);
       return res.json(
-        `UserId(${userId}) ${like ? "unliked" : "liked"} postId(${postId})`
+        `UserId(${userId}) ${
+          isUserLikedPost ? "unliked" : "liked"
+        } postId(${postId})`
       );
     } catch (err) {
       return res.status(400).send(err.message);
