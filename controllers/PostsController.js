@@ -5,12 +5,9 @@ class PostsController {
     this.user = db.user;
     this.like = db.like;
     this.category = db.category;
+    this.sequelize = db.sequelize;
   }
 
-  //get one post data using postId, can include comment,author,like.
-  //Input: authorId (from params)
-  //Optional Input: comment:any, like:any, author:any (from query)
-  //Output: postData (optional:comments, likes, author)
   async getOne(req, res) {
     const { postId } = req.params;
     if (isNaN(Number(postId))) {
@@ -35,9 +32,6 @@ class PostsController {
     }
   }
 
-  //create Data and add relationship with category
-  //Input: authorId:number, categories:string[], title:string, content:string (from body)
-  //Output: void
   async createPost(req, res) {
     const { categories, ...data } = req.body;
     if (isNaN(Number(data.authorId))) {
@@ -52,23 +46,26 @@ class PostsController {
     if (!data.title.length || !data.content.length) {
       return res.status(400).send("Must have content for title/content");
     }
+    const t = await this.sequelize.transaction();
     try {
-      const newPost = await this.post.create(data);
+      const newPost = await this.post.create(data, { transaction: t });
       for (const category of categories) {
         const categoryInstance = await this.category.findOne({
           where: { name: category },
         });
-        await newPost.addCategory(categoryInstance);
+        if (!categoryInstance) {
+          throw new Error(`Category name "${category}" cannot be found.`);
+        }
+        await newPost.addCategory(categoryInstance, { transaction: t });
       }
+      await t.commit();
       return res.send("Create Post Completed");
     } catch (err) {
+      await t.rollback();
       return res.status(400).send(err);
     }
   }
 
-  //Input: postId (from params)
-  //Input: userId:number, content:string (from body)
-  //Output: void
   async createComment(req, res) {
     const { postId } = req.params;
     if (isNaN(Number(postId))) {

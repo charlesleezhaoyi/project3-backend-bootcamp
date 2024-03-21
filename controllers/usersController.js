@@ -9,7 +9,7 @@ class UsersController extends BaseController {
     const { userEmail, firstName, lastName } = req.body;
 
     try {
-      const [user, created] = await this.model.findOrCreate({
+      await this.model.findOrCreate({
         where: {
           email: userEmail,
         },
@@ -21,7 +21,6 @@ class UsersController extends BaseController {
         message: "User created",
       });
     } catch (err) {
-      console.log(err);
       return res.status(400).json({
         error: true,
         msg: err,
