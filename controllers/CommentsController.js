@@ -12,8 +12,8 @@ class CommentsController {
     }
     try {
       const comments = await this.comment.findAll({
-        where: { postId: postId },
-        include: this.user,
+        where: { commentedPostId: postId },
+        include: { model: this.user, as: "commenter" },
         order: [["createdAt", "ASC"]],
       });
       return res.json(comments);
@@ -27,14 +27,14 @@ class CommentsController {
     if (isNaN(Number(postId))) {
       return res.status(400).send("Wrong Type of postId");
     }
-    const data = req.body;
-    if (isNaN(Number(data.userId))) {
+    const { userId, content } = req.body;
+    if (isNaN(Number(userId))) {
       return res.status(400).send("Wrong Type of userId");
     }
-    if (typeof data.content !== "string") {
+    if (typeof content !== "string") {
       return res.status(400).send("Wrong Type of content");
     }
-    if (!data.content.length) {
+    if (!content.length) {
       return res.status(400).send("Must have content for content");
     }
     try {
@@ -42,7 +42,7 @@ class CommentsController {
       if (!postData) {
         throw new Error("No Such Post Found.");
       }
-      await postData.createComment(data);
+      await postData.createComment({ commenterId: userId, content });
       return res.json("Create Comment Completed");
     } catch (err) {
       return res.status(400).send(err.message);

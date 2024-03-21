@@ -31,17 +31,14 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "commenterId",
         otherKey: "commentedPostId",
       });
-      this.hasMany(models.comment, {
-        as: "commenter",
-        foreignKey: "commenterId",
-      });
+      this.hasMany(models.comment, { foreignKey: "commenterId" });
       this.belongsToMany(models.post, {
         through: models.like,
         as: "likedPost",
         foreignKey: "likerId",
         otherKey: "likedPostId",
       });
-      this.hasMany(models.like, { as: "liker", foreignKey: "likerId" });
+      this.hasMany(models.like, { foreignKey: "likerId" });
       this.hasMany(models.post, { as: "author", foreignKey: "authorId" });
     }
   }

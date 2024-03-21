@@ -7,12 +7,9 @@ class CommentsRouter {
   }
 
   routes() {
-    router.get(
-      "/:postId/comments",
-      this.controller.getComments.bind(this.controller)
-    );
+    router.get("/:postId", this.controller.getComments.bind(this.controller));
     router.post(
-      "/:postId/comments",
+      "/:postId",
       this.controller.createComment.bind(this.controller)
     );
     return router;

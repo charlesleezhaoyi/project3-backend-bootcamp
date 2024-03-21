@@ -16,7 +16,6 @@ module.exports = (sequelize, DataTypes) => {
         otherKey: "commenterId",
       });
       this.hasMany(models.comment, {
-        as: "commentedPost",
         foreignKey: "commentedPostId",
       });
       this.belongsToMany(models.user, {
@@ -26,7 +25,6 @@ module.exports = (sequelize, DataTypes) => {
         otherKey: "likerId",
       });
       this.hasMany(models.like, {
-        as: "likedPost",
         foreignKey: "likedPostId",
       });
       this.belongsToMany(models.category, { through: "category_posts" });
