@@ -11,9 +11,20 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsToMany(models.category, { through: "user_categories" });
       this.hasMany(models.request);
       this.hasMany(models.donation);
-      this.belongsToMany(models.book, { as: "donor", through: "donation" });
-      this.belongsToMany(models.book, { as: "bene", through: "donation" });
-      this.belongsToMany(models.donation, { through: "request" });
+      this.belongsToMany(models.book, {
+        as: "donor",
+        through: "donation",
+        foreignKey: "donorId",
+      });
+      this.belongsToMany(models.book, {
+        as: "bene",
+        through: "donation",
+        foreignKey: "beneId",
+      });
+      this.belongsToMany(models.donation, {
+        through: "request",
+        foreignKey: "beneId",
+      });
       this.belongsToMany(models.post, { through: "likes" });
       this.hasMany(models.post);
       this.belongsToMany(models.post, { through: models.comment });
