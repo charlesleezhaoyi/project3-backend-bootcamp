@@ -1,7 +1,8 @@
+const { Op } = require("sequelize");
+
 class PostsController {
   constructor(db) {
     this.post = db.post;
-    this.comment = db.comment;
     this.user = db.user;
     this.like = db.like;
     this.category = db.category;
@@ -19,7 +20,7 @@ class PostsController {
       });
       return res.json(data);
     } catch (err) {
-      return res.status(400).send(err);
+      return res.status(400).send(err.message);
     }
   }
 
@@ -38,68 +39,55 @@ class PostsController {
       return res.status(400).send("Must have content for title/content");
     }
     const t = await this.sequelize.transaction();
-    const categoryInstances = [];
     try {
       const newPost = await this.post.create(data, { transaction: t });
-      for (const category of categories) {
-        const categoryInstance = await this.category.findOne({
-          where: { name: category },
-        });
-        if (!categoryInstance) {
-          throw new Error(`Category name "${category}" cannot be found.`);
-        }
-        categoryInstances.push(categoryInstance);
+      if (categories) {
+        await this.addingCategoriesToPost(categories, newPost, t);
       }
-      await newPost.setCategories(categoryInstances, { transaction: t });
       await t.commit();
       return res.send("Create Post Completed");
     } catch (err) {
       await t.rollback();
-      return res.status(400).send(err);
+      return res.status(400).send(err.message);
     }
   }
 
-  async getComments(req, res) {
-    const { postId } = req.params;
-    if (isNaN(Number(postId))) {
-      return res.status(400).send("Wrong Type of postId");
-    }
-    try {
-      const comments = await this.comment.findAll({
-        where: { postId: postId },
-        include: this.user,
-        order: [["createdAt", "ASC"]],
+  async addingCategoriesToPost(categories, post, t) {
+    const categoryInstances = [];
+    for (const category of categories) {
+      const categoryInstance = await this.category.findOne({
+        where: { name: category },
       });
-      return res.json(comments);
-    } catch (err) {
-      return res.status(400).send(err);
+      if (!categoryInstance) {
+        throw new Error(`Category name "${category}" cannot be found.`);
+      }
+      categoryInstances.push(categoryInstance);
     }
+    await post.setCategories(categoryInstances, { transaction: t });
   }
 
-  async createComment(req, res) {
-    const { postId } = req.params;
+  async toggleLike(req, res) {
+    const { postId, userId } = req.body;
     if (isNaN(Number(postId))) {
       return res.status(400).send("Wrong Type of postId");
     }
-    const data = req.body;
-    if (isNaN(Number(data.userId))) {
+    if (isNaN(Number(userId))) {
       return res.status(400).send("Wrong Type of userId");
     }
-    if (typeof data.content !== "string") {
-      return res.status(400).send("Wrong Type of content");
-    }
-    if (!data.content.length) {
-      return res.status(400).send("Must have content for content");
-    }
     try {
-      const postData = await this.post.findByPk(postId);
-      if (!postData) {
-        throw new Error("No Such Post Found.");
+      const like = await this.like.findOne({
+        where: { [Op.and]: [{ userId: userId }, { postId: postId }] },
+      });
+      if (like) {
+        await like.destroy();
+      } else {
+        await this.like.create(req.body);
       }
-      await postData.createComment(data);
-      return res.json("Create Comment Completed");
+      return res.json(
+        `UserId(${userId}) ${like ? "unliked" : "liked"} postId(${postId})`
+      );
     } catch (err) {
-      return res.status(400).send(err);
+      return res.status(400).send(err.message);
     }
   }
 }
