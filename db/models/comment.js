@@ -8,17 +8,23 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      this.belongsTo(models.post);
-      this.belongsTo(models.user);
+      this.belongsTo(models.post, {
+        as: "commentedPost",
+        foreignKey: "commentedPostId",
+      });
+      this.belongsTo(models.user, {
+        as: "commenter",
+        foreignKey: "commenterId",
+      });
     }
   }
   comment.init(
     {
-      postId: {
+      commentedPostId: {
         type: DataTypes.INTEGER,
         references: { model: "posts", key: "id" },
       },
-      userId: {
+      commenterId: {
         type: DataTypes.INTEGER,
         references: { model: "users", key: "id" },
       },
