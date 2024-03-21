@@ -20,21 +20,21 @@ module.exports = (sequelize, DataTypes) => {
       donorId: {
         type: DataTypes.INTEGER,
         references: {
-          model: "user",
+          model: "users",
           key: "id",
         },
       },
       bookId: {
         type: DataTypes.INTEGER,
         references: {
-          model: "book",
+          model: "books",
           key: "id",
         },
       },
       beneId: {
         type: DataTypes.INTEGER,
         references: {
-          model: "user",
+          model: "users",
           key: "id",
         },
       },
