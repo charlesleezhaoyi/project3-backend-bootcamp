@@ -14,7 +14,7 @@ class PostsController {
     }
     try {
       const data = await this.post.findByPk(postId, {
-        include: [{ model: this.user, as: "author" }, this.like],
+        include: [{ model: this.user, as: "author" }, this.like, this.category],
       });
       return res.json(data);
     } catch (err) {
