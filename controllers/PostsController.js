@@ -59,7 +59,22 @@ class PostsController {
     }
   }
 
-  async getComments(req, res) {}
+  async getComments(req, res) {
+    const { postId } = req.params;
+    if (isNaN(Number(postId))) {
+      return res.status(400).send("Wrong Type of postId");
+    }
+    try {
+      const comments = await this.comment.findAll({
+        where: { postId: postId },
+        include: this.user,
+        order: [["createdAt", "ASC"]],
+      });
+      return res.json(comments);
+    } catch (err) {
+      return res.status(400).send(err);
+    }
+  }
 
   async createComment(req, res) {
     const { postId } = req.params;
