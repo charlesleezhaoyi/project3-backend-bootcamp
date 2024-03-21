@@ -47,6 +47,7 @@ class PostsController {
       return res.status(400).send("Must have content for title/content");
     }
     const t = await this.sequelize.transaction();
+    const categoryInstances = [];
     try {
       const newPost = await this.post.create(data, { transaction: t });
       for (const category of categories) {
@@ -56,8 +57,9 @@ class PostsController {
         if (!categoryInstance) {
           throw new Error(`Category name "${category}" cannot be found.`);
         }
-        await newPost.addCategory(categoryInstance, { transaction: t });
+        categoryInstances.push(categoryInstance);
       }
+      await newPost.setCategories(categoryInstances, { transaction: t });
       await t.commit();
       return res.send("Create Post Completed");
     } catch (err) {
