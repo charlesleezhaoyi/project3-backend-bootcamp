@@ -13,19 +13,10 @@ class PostsController {
     if (isNaN(Number(postId))) {
       return res.status(400).send("Wrong Type of postId");
     }
-    const { comment, author, like } = req.query;
-    const include = [];
-    if (comment) {
-      include.push(this.comment);
-    }
-    if (author) {
-      include.push({ model: this.user, as: "author" });
-    }
-    if (like) {
-      include.push(this.like);
-    }
     try {
-      const data = await this.post.findByPk(postId, { include: include });
+      const data = await this.post.findByPk(postId, {
+        include: [{ model: this.user, as: "author" }, this.like],
+      });
       return res.json(data);
     } catch (err) {
       return res.status(400).send(err);
@@ -67,6 +58,8 @@ class PostsController {
       return res.status(400).send(err);
     }
   }
+
+  async getComments(req, res) {}
 
   async createComment(req, res) {
     const { postId } = req.params;
