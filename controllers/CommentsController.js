@@ -24,7 +24,6 @@ class CommentsController {
 
   async createComment(req, res) {
     const { postId } = req.params;
-
     try {
       if (isNaN(Number(postId))) {
         throw new Error("Wrong Type of postId");

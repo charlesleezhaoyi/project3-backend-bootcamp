@@ -4,6 +4,7 @@ class PostsController {
     this.user = db.user;
     this.like = db.like;
     this.category = db.category;
+    this.comment = db.comment;
     this.sequelize = db.sequelize;
   }
 
@@ -22,12 +23,10 @@ class PostsController {
     }
   }
 
-  //sortBy: popular(likes no.), newest comment
   async getPostsFromCategory(req, res) {
     const { category } = req.params;
-    let { sortBy, order, limit, page } = req.query;
+    let { sortBy, limit, page } = req.query;
     const sortByList = ["newestPost", "newestComment", "popular"];
-    const orderList = ["ASC", "DESC"];
     try {
       if (!!limit && isNaN(Number(limit))) {
         throw new Error("Wrong type of limit");
@@ -43,13 +42,7 @@ class PostsController {
           `ValueError: Wrong value of sortBy ("newestPost"/"newestComment"/"popular")`
         );
       }
-      if (!!order && !orderList.includes(order)) {
-        throw new Error(`ValueError: Wrong value of order ("ASC"/"DESC")`);
-      }
-      if (!!sortBy && !order) {
-        order = "DESC";
-      }
-      const postsOption = this.getPostsOption(sortBy, order, limit, page);
+      const postsOption = this.getPostsOption(sortBy, limit, page);
       const categoryInstance = await this.category.findOne({
         where: { name: category },
       });
@@ -66,7 +59,7 @@ class PostsController {
     }
   }
 
-  getPostsOption(sortBy, order, limit, page) {
+  getPostsOption(sortBy, limit, page) {
     const postsOption = {
       include: [
         { model: this.user, as: "author" },
@@ -92,12 +85,18 @@ class PostsController {
     }
     switch (sortBy) {
       case "newestPost":
-        postsOption.order = [["createdAt", order]];
+        postsOption.order = [["createdAt", "DESC"]];
         break;
       case "newestComment":
+        postsOption.include.push({
+          model: this.comment,
+          attributes: [],
+        });
+        postsOption.group.push("comments.created_at");
+        postsOption.order = [[this.comment, "createdAt", "DESC"]];
         break;
       case "popular":
-        postsOption.order = [["likeCount", order]];
+        postsOption.order = [["likeCount", "DESC"]];
         break;
     }
     return postsOption;
