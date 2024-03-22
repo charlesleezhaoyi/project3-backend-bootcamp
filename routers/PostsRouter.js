@@ -7,6 +7,10 @@ class PostsRouter {
   }
 
   routes() {
+    router.get(
+      "/category/:category",
+      this.controller.getPostsFromCategory.bind(this.controller)
+    );
     router.get("/:postId", this.controller.getOne.bind(this.controller));
     router.post("/", this.controller.createPost.bind(this.controller));
     router.put("/likes", this.controller.toggleLike.bind(this.controller));
