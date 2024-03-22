@@ -22,7 +22,7 @@ class PostsController {
     }
   }
 
-  //sortBy: newestpost , popular(likes no.), newest comment
+  //sortBy: popular(likes no.), newest comment
   async getPostsFromCategory(req, res) {
     const { category } = req.params;
     let { sortBy, order, limit, page } = req.query;
@@ -61,7 +61,9 @@ class PostsController {
   }
 
   getPostsOption(sortBy, order, limit, page) {
-    const postsOption = { include: [{ model: this.user, as: "author" }] };
+    const postsOption = {
+      include: [{ model: this.user, as: "author" }, this.like],
+    };
     if (!!limit && !page) {
       page = 1;
     }
@@ -149,7 +151,11 @@ class PostsController {
         throw new Error("No Such User Found");
       }
       const isUserLikedPost = await post.hasLiker(user);
-      await post.setLiker(isUserLikedPost ? [] : [user]);
+      if (isUserLikedPost) {
+        await post.removeLiker(user);
+      } else {
+        await post.addLiker(user);
+      }
       return res.json(
         `UserId(${userId}) ${
           isUserLikedPost ? "unliked" : "liked"
