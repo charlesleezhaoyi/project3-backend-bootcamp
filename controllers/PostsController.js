@@ -26,6 +26,7 @@ class PostsController {
   async getPostsFromCategory(req, res) {
     const { category } = req.params;
     let { sortBy, order, limit, page } = req.query;
+    const sortByList = ["newestPost", "newestComment", "popular"];
     const orderList = ["ASC", "DESC"];
     try {
       if (!!limit && isNaN(Number(limit))) {
@@ -37,8 +38,13 @@ class PostsController {
       if (!!page && !limit) {
         throw new Error("Must have limit for page");
       }
+      if (!!sortBy && !sortByList.includes(sortBy)) {
+        throw new Error(
+          `ValueError: Wrong value of sortBy ("newestPost"/"newestComment"/"popular")`
+        );
+      }
       if (!!order && !orderList.includes(order)) {
-        throw new Error(`order: Wrong value of order ("ASC"/"DESC")`);
+        throw new Error(`ValueError: Wrong value of order ("ASC"/"DESC")`);
       }
       if (!!sortBy && !order) {
         order = "DESC";
@@ -62,7 +68,19 @@ class PostsController {
 
   getPostsOption(sortBy, order, limit, page) {
     const postsOption = {
-      include: [{ model: this.user, as: "author" }, this.like],
+      include: [
+        { model: this.user, as: "author" },
+        { model: this.like, attributes: [] },
+      ],
+      group: ["post.id", "author.id"],
+      attributes: {
+        include: [
+          [
+            this.sequelize.fn("COUNT", this.sequelize.col("likes.id")),
+            "likeCount",
+          ],
+        ],
+      },
     };
     if (!!limit && !page) {
       page = 1;
@@ -79,13 +97,8 @@ class PostsController {
       case "newestComment":
         break;
       case "popular":
+        postsOption.order = [["likeCount", order]];
         break;
-      case undefined:
-        break;
-      default:
-        throw new Error(
-          `ValueError: Wrong value of sortBy ("newestPost"/"newestComment"/"popular")`
-        );
     }
     return postsOption;
   }
