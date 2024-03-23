@@ -1,8 +1,7 @@
 class CommentsController {
-  constructor(comment, post, user) {
+  constructor(comment, post) {
     this.comment = comment;
     this.post = post;
-    this.user = user;
   }
 
   async getComments(req, res) {
@@ -13,7 +12,7 @@ class CommentsController {
       }
       const comments = await this.comment.findAll({
         where: { commentedPostId: postId },
-        include: { model: this.user, as: "commenter" },
+        include: "commenter",
         order: [["createdAt", "ASC"]],
       });
       return res.json(comments);

@@ -23,9 +23,9 @@ const { user, category, book, comment, post } = db;
 // Initializing Controllers
 const userController = new UsersController(user);
 const postsController = new PostsController(db);
-const categoriesController = new CategoriesController(category);
+const categoriesController = new CategoriesController(category, db);
 const bookController = new BooksController(book);
-const commentsController = new CommentsController(comment, post, user);
+const commentsController = new CommentsController(comment, post);
 
 // Initializing Routers
 const usersRouter = new UsersRouter(userController);

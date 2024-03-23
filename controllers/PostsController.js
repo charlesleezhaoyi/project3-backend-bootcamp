@@ -2,9 +2,9 @@ class PostsController {
   constructor(db) {
     this.post = db.post;
     this.user = db.user;
-    this.like = db.like;
     this.category = db.category;
     this.comment = db.comment;
+    this.like = db.like;
     this.sequelize = db.sequelize;
   }
 
@@ -15,7 +15,7 @@ class PostsController {
         throw new Error("Wrong Type of postId");
       }
       const data = await this.post.findByPk(postId, {
-        include: [{ model: this.user, as: "author" }, this.like, this.category],
+        include: ["author", "likes", "categories"],
       });
       return res.json(data);
     } catch (err) {
@@ -61,10 +61,7 @@ class PostsController {
 
   getPostsOption(sortBy, limit, page) {
     const postsOption = {
-      include: [
-        { model: this.user, as: "author" },
-        { model: this.like, attributes: [] },
-      ],
+      include: ["author", { model: this.like, attributes: [] }],
       group: ["post.id", "author.id"],
       attributes: {
         include: [
@@ -93,7 +90,7 @@ class PostsController {
           attributes: [],
         });
         postsOption.group.push("comments.created_at");
-        postsOption.order = [[this.comment, "createdAt", "DESC"]];
+        postsOption.order = [["comments", "createdAt", "DESC"]];
         break;
       case "popular":
         postsOption.order = [["likeCount", "DESC"]];
