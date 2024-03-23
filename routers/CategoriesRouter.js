@@ -8,6 +8,10 @@ class CategoriesRouter {
 
   routes() {
     router.get("/all", this.controller.getAll.bind(this.controller));
+    router.get(
+      "/all/sort/:sortBy",
+      this.controller.getAllCategoriesWithSortBy.bind(this.controller)
+    );
     return router;
   }
 }
