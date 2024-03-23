@@ -10,44 +10,33 @@ class CategoriesController extends BaseController {
 
   async getAllCategoriesWithSortBy(req, res) {
     const { sortBy } = req.params;
-    const sortByList = ["popular", "newestPost", "newestComment"];
+    const sortByList = [
+      "name",
+      "popularSection",
+      "newestPost",
+      "newestComment",
+    ];
     try {
       if (!sortByList.includes(sortBy)) {
         throw new Error(
-          `ValueError: ${sortBy} is not a correct value("popular"/ "newestPost"/ "newestComment")`
+          `ValueError: ${sortBy} is not a correct value("name"/"popularSection"/"newestPost"/"newestComment")`
         );
       }
       const categoryOption = this.getCategoryOption(sortBy);
-      const categories = await this.model.findAll({ ...categoryOption });
+      const categories = await this.model.findAll(categoryOption);
       return res.json(categories);
     } catch (error) {
       return res.status(400).send(error.message);
     }
   }
 
-  getCategoryOption(sortBY) {
-    const categoryOption = {
-      include: [
-        {
-          model: this.post,
-          attributes: [],
-          include: [{ model: this.like, attributes: [] }],
-          through: { attributes: [] },
-        },
-      ],
-      group: ["category.id"],
-      attributes: {
-        include: [
-          [
-            this.sequelize.fn("COUNT", this.sequelize.col("posts.likes.id")),
-            "likeCount",
-          ],
-        ],
-      },
-    };
-    switch (sortBY) {
-      case "popular":
-        categoryOption.order = [["likeCount", "DESC"]];
+  getCategoryOption(sortBy) {
+    const categoryOption = {};
+    switch (sortBy) {
+      case "name":
+        categoryOption.order = [["name", "DESC"]];
+        break;
+      case "popularSection":
         break;
       case "newestPost":
         break;
