@@ -9,7 +9,7 @@ class CategoriesController extends BaseController {
     this.sequelize = db.sequelize;
   }
 
-  async getAllCategoriesWithSortBy(req, res) {
+  async getSortedCategories(req, res) {
     const { sortBy } = req.params;
     const sortByList = [
       "name",
@@ -38,6 +38,19 @@ class CategoriesController extends BaseController {
         categoryOption.order = [["name", "ASC"]];
         break;
       case "popularSection":
+        categoryOption.include = {
+          model: this.post,
+          attributes: [],
+          through: { attributes: [] },
+          include: [{ model: this.like, attributes: [] }],
+        };
+        categoryOption.group = ["category.id"];
+        categoryOption.order = [
+          [
+            this.sequelize.fn("COUNT", this.sequelize.col("posts.likes.id")),
+            "DESC",
+          ],
+        ];
         break;
       case "newestPost":
         categoryOption.include = {

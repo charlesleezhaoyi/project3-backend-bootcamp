@@ -10,7 +10,7 @@ class CategoriesRouter {
     router.get("/all", this.controller.getAll.bind(this.controller));
     router.get(
       "/all/sort/:sortBy",
-      this.controller.getAllCategoriesWithSortBy.bind(this.controller)
+      this.controller.getSortedCategories.bind(this.controller)
     );
     return router;
   }
