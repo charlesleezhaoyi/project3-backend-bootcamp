@@ -9,9 +9,24 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       this.belongsTo(models.user, { as: "author", foreignKey: "authorId" });
-      this.belongsToMany(models.user, { through: "likes" });
-      this.belongsToMany(models.user, { through: models.comment });
-      this.hasMany(models.comment);
+      this.belongsToMany(models.user, {
+        as: "commenter",
+        through: models.comment,
+        foreignKey: "commentedPostId",
+        otherKey: "commenterId",
+      });
+      this.hasMany(models.comment, {
+        foreignKey: "commentedPostId",
+      });
+      this.belongsToMany(models.user, {
+        through: models.like,
+        as: "liker",
+        foreignKey: "likedPostId",
+        otherKey: "likerId",
+      });
+      this.hasMany(models.like, {
+        foreignKey: "likedPostId",
+      });
       this.belongsToMany(models.category, { through: "category_posts" });
     }
   }

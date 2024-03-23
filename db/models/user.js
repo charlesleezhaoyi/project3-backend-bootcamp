@@ -25,10 +25,21 @@ module.exports = (sequelize, DataTypes) => {
         through: "request",
         foreignKey: "beneId",
       });
-      this.belongsToMany(models.post, { through: "likes" });
-      this.hasMany(models.post);
-      this.belongsToMany(models.post, { through: models.comment });
-      this.hasMany(models.comment);
+      this.belongsToMany(models.post, {
+        as: "commentedPost",
+        through: models.comment,
+        foreignKey: "commenterId",
+        otherKey: "commentedPostId",
+      });
+      this.hasMany(models.comment, { foreignKey: "commenterId" });
+      this.belongsToMany(models.post, {
+        through: models.like,
+        as: "likedPost",
+        foreignKey: "likerId",
+        otherKey: "likedPostId",
+      });
+      this.hasMany(models.like, { foreignKey: "likerId" });
+      this.hasMany(models.post, { as: "author", foreignKey: "authorId" });
     }
   }
   user.init(
