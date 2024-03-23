@@ -5,6 +5,7 @@ class CategoriesController extends BaseController {
     super(model);
     this.post = db.post;
     this.like = db.like;
+    this.comment = db.comment;
     this.sequelize = db.sequelize;
   }
 
@@ -34,13 +35,26 @@ class CategoriesController extends BaseController {
     const categoryOption = {};
     switch (sortBy) {
       case "name":
-        categoryOption.order = [["name", "DESC"]];
+        categoryOption.order = [["name", "ASC"]];
         break;
       case "popularSection":
         break;
       case "newestPost":
+        categoryOption.include = {
+          model: this.post,
+          attributes: [],
+        };
+        categoryOption.order = [[this.post, "createdAt", "DESC NULLS LAST"]];
         break;
       case "newestComment":
+        categoryOption.include = {
+          model: this.post,
+          attributes: [],
+          include: [{ model: this.comment, attributes: [] }],
+        };
+        categoryOption.order = [
+          [this.post, this.comment, "createdAt", "DESC NULLS LAST"],
+        ];
         break;
     }
     return categoryOption;
