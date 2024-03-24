@@ -16,20 +16,48 @@ module.exports = {
       "categories",
       [
         {
-          name: "science fiction",
+          name: "Fiction",
           created_at: new Date(),
           updated_at: new Date(),
         },
-        { name: "horror", created_at: new Date(), updated_at: new Date() },
-        { name: "romance", created_at: new Date(), updated_at: new Date() },
-        { name: "adventure", created_at: new Date(), updated_at: new Date() },
+        { name: "Non-Fiction", created_at: new Date(), updated_at: new Date() },
         {
-          name: "history",
+          name: "Science Fiction",
           created_at: new Date(),
           updated_at: new Date(),
         },
         {
-          name: "biography",
+          name: "Fantasy",
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+        {
+          name: "Mystery",
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+        {
+          name: "Romance",
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+        {
+          name: "Horror",
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+        {
+          name: "Biography",
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+        {
+          name: "History",
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+        {
+          name: "Self-Help",
           created_at: new Date(),
           updated_at: new Date(),
         },

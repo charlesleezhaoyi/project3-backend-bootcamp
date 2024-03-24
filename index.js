@@ -21,7 +21,7 @@ const db = require("./db/models/index");
 const { user, category, book, comment, post } = db;
 
 // Initializing Controllers
-const userController = new UsersController(user);
+const userController = new UsersController(user, category);
 const postsController = new PostsController(db);
 const categoriesController = new CategoriesController(category);
 const bookController = new BooksController(book);
