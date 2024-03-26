@@ -5,16 +5,6 @@ class UsersController extends BaseController {
     super(model);
   }
 
-  async getUserByEmail(req, res) {
-    const { userEmail } = req.params;
-    try {
-      const user = await this.model.findOne({ where: { email: userEmail } });
-      return res.json(user);
-    } catch (error) {
-      return res.status(400).send(error.message);
-    }
-  }
-
   async insertUser(req, res) {
     const { userEmail, firstName, lastName } = req.body;
 

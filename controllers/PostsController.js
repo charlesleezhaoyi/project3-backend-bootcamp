@@ -100,12 +100,9 @@ class PostsController {
   }
 
   async createPost(req, res) {
-    const { categories, ...data } = req.body;
+    const { categories, authorEmail, ...data } = req.body;
     const t = await this.sequelize.transaction();
     try {
-      if (isNaN(Number(data.authorId))) {
-        throw new Error("Wrong Type of authorId");
-      }
       if (!data.title || !data.content) {
         throw new Error("Must have title/content data");
       }
@@ -115,7 +112,8 @@ class PostsController {
       if (!data.title.length || !data.content.length) {
         throw new Error("Must have content for title/content");
       }
-
+      const author = await this.user.findOne({ where: { email: authorEmail } });
+      data.authorId = author.id;
       const newPost = await this.post.create(data, { transaction: t });
       if (categories) {
         await this.addingCategoriesToPost(categories, newPost, t);
@@ -143,19 +141,16 @@ class PostsController {
   }
 
   async toggleLike(req, res) {
-    const { postId, userId } = req.body;
+    const { postId, userEmail } = req.body;
     try {
       if (isNaN(Number(postId))) {
         throw new Error("Wrong Type of postId");
-      }
-      if (isNaN(Number(userId))) {
-        throw new Error("Wrong Type of userId");
       }
       const post = await this.post.findByPk(postId);
       if (!post) {
         throw new Error("No Such Post Found");
       }
-      const user = await this.user.findByPk(userId);
+      const user = await this.user.findOne({ where: { email: userEmail } });
       if (!post) {
         throw new Error("No Such User Found");
       }
@@ -166,7 +161,7 @@ class PostsController {
         await post.addLiker(user);
       }
       return res.json(
-        `UserId(${userId}) ${
+        `UserId(${user.id}) ${
           isUserLikedPost ? "unliked" : "liked"
         } postId(${postId})`
       );
