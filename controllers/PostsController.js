@@ -121,7 +121,7 @@ class PostsController {
         await this.addingCategoriesToPost(categories, newPost, t);
       }
       await t.commit();
-      return res.send("Create Post Completed");
+      return res.send(newPost);
     } catch (err) {
       await t.rollback();
       return res.status(400).send(err.message);
