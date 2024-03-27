@@ -53,13 +53,17 @@ class PostsController {
         joinTableAttributes: [],
         ...postsOption,
       });
+      if (!!limit) {
+        const offset = page ? (page - 1) * limit : 0;
+        return res.json(posts.slice(offset, limit));
+      }
       return res.json(posts);
     } catch (error) {
       return res.status(400).send(error.message);
     }
   }
 
-  getPostsOption(sortBy, limit, page) {
+  getPostsOption(sortBy) {
     const postsOption = {
       include: ["author", { model: this.like, attributes: [] }],
       group: ["post.id", "author.id"],
@@ -72,14 +76,6 @@ class PostsController {
         ],
       },
     };
-    if (!!limit && !page) {
-      page = 1;
-    }
-    if (!!limit) {
-      const offset = (page - 1) * limit;
-      postsOption.offset = offset;
-      postsOption.limit = limit;
-    }
     switch (sortBy) {
       case "newestPost":
         postsOption.order = [["createdAt", "DESC"]];
