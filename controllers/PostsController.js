@@ -15,7 +15,15 @@ class PostsController {
         throw new Error("Wrong Type of postId");
       }
       const data = await this.post.findByPk(postId, {
-        include: ["author", "likes", "categories", "comments"],
+        include: [
+          "author",
+          "likes",
+          "categories",
+          {
+            model: this.comment,
+            include: { model: this.user, as: "commenter" },
+          },
+        ],
       });
       return res.json(data);
     } catch (err) {
