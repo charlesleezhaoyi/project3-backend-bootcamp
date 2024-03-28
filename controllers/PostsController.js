@@ -149,13 +149,13 @@ class PostsController {
       throw new Error("No Such User Found");
     }
     const isUserLikedPost = await post.hasLiker(user);
-    return isUserLikedPost;
+    return [isUserLikedPost, post, user];
   }
 
   async getIsUserLikedPost(req, res) {
     const { postId, userEmail } = req.params;
     try {
-      const isUserLikedPost = await this.checkIsUserLikedPost(
+      const [isUserLikedPost] = await this.checkIsUserLikedPost(
         postId,
         userEmail
       );
@@ -168,7 +168,7 @@ class PostsController {
   async toggleLike(req, res) {
     const { postId, userEmail, like } = req.body;
     try {
-      const isUserLikedPost = await this.checkIsUserLikedPost(
+      const [isUserLikedPost, post, user] = await this.checkIsUserLikedPost(
         postId,
         userEmail
       );
@@ -184,6 +184,7 @@ class PostsController {
       }
       return res.json(!isUserLikedPost);
     } catch (err) {
+      console.log(err);
       return res.status(400).send(err.message);
     }
   }
