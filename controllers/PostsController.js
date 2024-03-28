@@ -136,21 +136,42 @@ class PostsController {
     await post.setCategories(categoryInstances, { transaction: t });
   }
 
+  async checkIsUserLikedPost(postId, userEmail) {
+    if (isNaN(Number(postId))) {
+      throw new Error("Wrong Type of postId");
+    }
+    const post = await this.post.findByPk(postId);
+    if (!post) {
+      throw new Error("No Such Post Found");
+    }
+    const user = await this.user.findOne({ where: { email: userEmail } });
+    if (!post) {
+      throw new Error("No Such User Found");
+    }
+    const isUserLikedPost = await post.hasLiker(user);
+    return isUserLikedPost;
+  }
+
+  async getIsUserLikedPost(req, res) {
+    const { postId, userEmail } = req.params;
+    try {
+      const isUserLikedPost = await this.checkIsUserLikedPost(
+        postId,
+        userEmail
+      );
+      return res.json(isUserLikedPost);
+    } catch (err) {
+      return res.status(400).send(err.message);
+    }
+  }
+
   async toggleLike(req, res) {
     const { postId, userEmail } = req.body;
     try {
-      if (isNaN(Number(postId))) {
-        throw new Error("Wrong Type of postId");
-      }
-      const post = await this.post.findByPk(postId);
-      if (!post) {
-        throw new Error("No Such Post Found");
-      }
-      const user = await this.user.findOne({ where: { email: userEmail } });
-      if (!post) {
-        throw new Error("No Such User Found");
-      }
-      const isUserLikedPost = await post.hasLiker(user);
+      const isUserLikedPost = await this.checkIsUserLikedPost(
+        postId,
+        userEmail
+      );
       if (isUserLikedPost) {
         await post.removeLiker(user);
       } else {
