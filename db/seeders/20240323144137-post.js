@@ -18,16 +18,16 @@ module.exports = {
         content:
           "Welcome to our forum! This is a place to introduce yourself and get to know other members of the community.",
         author_id: 1,
-        created_at: new Date("2024-01-01T03:24:00"),
-        updated_at: new Date("2024-01-01T03:24:00"),
+        created_at: new Date("2024-01-01T03:23:00"),
+        updated_at: new Date("2024-01-01T03:23:00"),
       },
       {
         title: "Favorite Books",
         content:
           "Share your favorite books and recommendations with fellow book lovers. What are you currently reading?",
         author_id: 2,
-        created_at: new Date("2024-01-02T04:24:00"),
-        updated_at: new Date("2024-01-02T04:24:00"),
+        created_at: new Date("2024-01-02T04:23:00"),
+        updated_at: new Date("2024-01-02T04:23:00"),
       },
       {
         title: 'Book Recommendation: "The Great Gatsby"',
