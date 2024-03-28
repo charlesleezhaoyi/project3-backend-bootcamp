@@ -166,22 +166,23 @@ class PostsController {
   }
 
   async toggleLike(req, res) {
-    const { postId, userEmail } = req.body;
+    const { postId, userEmail, like } = req.body;
     try {
       const isUserLikedPost = await this.checkIsUserLikedPost(
         postId,
         userEmail
       );
+      if (like === isUserLikedPost) {
+        throw new Error(
+          `User already ${like ? "liked" : "unliked"} this post before`
+        );
+      }
       if (isUserLikedPost) {
         await post.removeLiker(user);
       } else {
         await post.addLiker(user);
       }
-      return res.json(
-        `UserId(${user.id}) ${
-          isUserLikedPost ? "unliked" : "liked"
-        } postId(${postId})`
-      );
+      return res.json(!isUserLikedPost);
     } catch (err) {
       return res.status(400).send(err.message);
     }
