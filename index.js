@@ -5,22 +5,26 @@ require("dotenv").config();
 // importing Routers
 const UsersRouter = require("./routers/usersRouter");
 const BooksRouter = require("./routers/booksRouter");
+const CategoriesRouter = require("./routers/categoriesRouter");
 
 // importing Controllers
 const UsersController = require("./controllers/usersController");
 const BooksController = require("./controllers/booksController");
+const CategoriesController = require("./controllers/categoriesController");
 
 //importing DB
 const db = require("./db/models/index");
-const { user, book } = db;
+const { user, book, photo, category } = db;
 
 // Initializing Controllers
 const userController = new UsersController(user);
-const bookController = new BooksController(book);
+const bookController = new BooksController(book, photo, category);
+const categoryController = new CategoriesController(category);
 
 // Initializing Routers
 const usersRouter = new UsersRouter(userController);
 const booksRouter = new BooksRouter(bookController);
+const categoriesRouter = new CategoriesRouter(categoryController);
 
 const PORT = 3000;
 const app = express();
@@ -34,6 +38,7 @@ app.use(express.json());
 // Enable and use usersRouter
 app.use("/users", usersRouter.routes());
 app.use("/books", booksRouter.routes());
+app.use("/categories", categoriesRouter.routes());
 
 app.listen(PORT, () => {
   console.log(`Express app listening on port ${PORT}!`);

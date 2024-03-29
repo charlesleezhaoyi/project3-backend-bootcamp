@@ -8,12 +8,12 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      this.belongsTo(models.book);
+      this.belongsTo(models.book, { onDelete: "CASCADE" });
     }
   }
   photo.init(
     {
-      photo_url: DataTypes.STRING,
+      photoUrl: DataTypes.STRING,
       bookId: {
         type: DataTypes.INTEGER,
         references: {
