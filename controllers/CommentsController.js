@@ -40,8 +40,11 @@ class CommentsController {
         throw new Error("No Such Post Found.");
       }
       const user = await this.user.findOne({ where: { email: userEmail } });
-      await postData.createComment({ commenterId: user.id, content });
-      return res.json("Create Comment Completed");
+      const comment = await postData.createComment({
+        commenterId: user.id,
+        content,
+      });
+      return res.json({ user, comment });
     } catch (err) {
       return res.status(400).send(err.message);
     }
