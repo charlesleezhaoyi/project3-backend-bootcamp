@@ -1,7 +1,8 @@
 class CommentsController {
-  constructor(comment, post) {
+  constructor(comment, post, user) {
     this.comment = comment;
     this.post = post;
+    this.user = user;
   }
 
   async getComments(req, res) {
@@ -27,10 +28,7 @@ class CommentsController {
       if (isNaN(Number(postId))) {
         throw new Error("Wrong Type of postId");
       }
-      const { userId, content } = req.body;
-      if (isNaN(Number(userId))) {
-        throw new Error("Wrong Type of userId");
-      }
+      const { userEmail, content } = req.body;
       if (typeof content !== "string") {
         throw new Error("Wrong Type of content");
       }
@@ -41,8 +39,12 @@ class CommentsController {
       if (!postData) {
         throw new Error("No Such Post Found.");
       }
-      await postData.createComment({ commenterId: userId, content });
-      return res.json("Create Comment Completed");
+      const user = await this.user.findOne({ where: { email: userEmail } });
+      const comment = await postData.createComment({
+        commenterId: user.id,
+        content,
+      });
+      return res.json({ user, comment });
     } catch (err) {
       return res.status(400).send(err.message);
     }
