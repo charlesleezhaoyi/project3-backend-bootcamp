@@ -1,3 +1,36 @@
+// const BaseController = require("./baseController");
+
+// class UsersController extends BaseController {
+//   constructor(model) {
+//     super(model);
+//   }
+
+//   async insertUser(req, res) {
+//     const { userEmail, firstName, lastName, phone } = req.body;
+
+//     try {
+//       const newUser = await this.model.findOrCreate({
+//         where: {
+//           email: userEmail,
+//         },
+//         first_name: firstName,
+//         last_name: lastName,
+//         phone: phone,
+//       });
+
+//       return res.json(newUser).json({
+//         message: "User created!",
+//       });
+//     } catch (err) {
+//       return res.status(400).json({
+//         error: true,
+//         msg: err,
+//       });
+//     }
+//   }
+// }
+// module.exports = UsersController;
+
 const BaseController = require("./baseController");
 
 class UsersController extends BaseController {
@@ -6,26 +39,18 @@ class UsersController extends BaseController {
   }
 
   async insertUser(req, res) {
-    const { userEmail, firstName, lastName } = req.body;
+    const { email, firstName, lastName, phone } = req.body;
 
     try {
-      const [user, created] = await this.model.findOrCreate({
-        where: {
-          email: userEmail,
-        },
-        first_name: firstName,
-        last_name: lastName,
+      const newUser = this.model.create({
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        phone: phone,
       });
-
-      return res.status(200).json({
-        message: "User created",
-      });
+      return res.json(newUser);
     } catch (err) {
-      console.log(err);
-      return res.status(400).json({
-        error: true,
-        msg: err,
-      });
+      return res.status(400).json({ error: true, msg: err });
     }
   }
 }
