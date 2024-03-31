@@ -5,7 +5,7 @@ require("dotenv").config();
 // importing Routers
 const UsersRouter = require("./routers/usersRouter");
 const PostsRouter = require("./routers/PostsRouter");
-const CategoriesRouter = require("./routers/CategoriesRouter");
+const CategoriesRouter = require("./routers/categoriesRouter");
 const BooksRouter = require("./routers/booksRouter");
 const RequestsRouter = require("./routers/requestsRouter");
 const CommentsRouter = require("./routers/CommentsRouter");
@@ -13,7 +13,7 @@ const CommentsRouter = require("./routers/CommentsRouter");
 // importing Controllers
 const UsersController = require("./controllers/usersController");
 const PostsController = require("./controllers/PostsController");
-const CategoriesController = require("./controllers/CategoriesController");
+const CategoriesController = require("./controllers/categoriesController");
 const BooksController = require("./controllers/booksController");
 const RequestsController = require("./controllers/requestsController");
 const CommentsController = require("./controllers/CommentsController");
