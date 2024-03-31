@@ -7,13 +7,13 @@ class CommentsController {
 
   async getComments(req, res) {
     const { postId } = req.params;
-    if (isNaN(Number(postId))) {
-      return res.status(400).send("Wrong Type of postId");
-    }
     try {
+      if (isNaN(Number(postId))) {
+        throw new Error("Wrong Type of postId");
+      }
       const comments = await this.comment.findAll({
         where: { commentedPostId: postId },
-        include: { model: this.user, as: "commenter" },
+        include: "commenter",
         order: [["createdAt", "ASC"]],
       });
       return res.json(comments);
@@ -24,26 +24,27 @@ class CommentsController {
 
   async createComment(req, res) {
     const { postId } = req.params;
-    if (isNaN(Number(postId))) {
-      return res.status(400).send("Wrong Type of postId");
-    }
-    const { userId, content } = req.body;
-    if (isNaN(Number(userId))) {
-      return res.status(400).send("Wrong Type of userId");
-    }
-    if (typeof content !== "string") {
-      return res.status(400).send("Wrong Type of content");
-    }
-    if (!content.length) {
-      return res.status(400).send("Must have content for content");
-    }
     try {
+      if (isNaN(Number(postId))) {
+        throw new Error("Wrong Type of postId");
+      }
+      const { userEmail, content } = req.body;
+      if (typeof content !== "string") {
+        throw new Error("Wrong Type of content");
+      }
+      if (!content.length) {
+        throw new Error("Must have content for content");
+      }
       const postData = await this.post.findByPk(postId);
       if (!postData) {
         throw new Error("No Such Post Found.");
       }
-      await postData.createComment({ commenterId: userId, content });
-      return res.json("Create Comment Completed");
+      const user = await this.user.findOne({ where: { email: userEmail } });
+      const comment = await postData.createComment({
+        commenterId: user.id,
+        content,
+      });
+      return res.json({ user, comment });
     } catch (err) {
       return res.status(400).send(err.message);
     }

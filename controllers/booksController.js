@@ -1,4 +1,5 @@
 const BaseController = require("./baseController");
+const { Sequelize, Op } = require("sequelize");
 
 class BooksController extends BaseController {
   constructor(model) {
@@ -21,6 +22,39 @@ class BooksController extends BaseController {
       return res.json(newBook);
     } catch (err) {
       return res.status(400).json({ error: true, msg: err });
+    }
+  }
+
+  //To Test
+  async getRelatedBooks(req, res) {
+    const { title, author, description } = req.body;
+
+    try {
+      const data = await this.model.findAll({
+        where: {
+          [Op.or]: [
+            { title: { [Op.like]: `%${title}%` } },
+            { author: { [Op.like]: `%${author}%` } },
+            { description: { [Op.like]: `%${description}%` } },
+          ],
+        },
+      });
+
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({
+        message: "An error occurred while fetching the book data.",
+        error: error.message,
+      });
+    }
+  }
+
+  async getAllBooks(req, res) {
+    try {
+      const data = await this.post.findAll();
+      return res.json(data);
+    } catch (err) {
+      return res.status(400).send(err.message);
     }
   }
 }
