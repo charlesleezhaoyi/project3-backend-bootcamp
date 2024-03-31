@@ -11,6 +11,13 @@ module.exports = {
         created_at: new Date(),
         updated_at: new Date(),
       },
+      {
+        first_name: "Ian",
+        last_name: "Lau",
+        email: "example@IanLau.com",
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
     ]);
   },
   down: (queryInterface, Sequelize) => {

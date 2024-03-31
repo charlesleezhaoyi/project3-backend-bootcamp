@@ -52,16 +52,11 @@ class BooksController extends BaseController {
     try {
       const books = await this.model.findAll({
         include: this.photoModel,
-        // attributes: ["title", "author", "condition"],
       });
 
       const booksArr = [];
 
-      const book = books.forEach((item) => {
-        console.log(item.author);
-        // const title = item.title
-        // const author = item.author
-        // const condition = item.condition
+      books.forEach((item) => {
         const singlePhoto = item.photos[0];
 
         const obj = {
@@ -72,16 +67,7 @@ class BooksController extends BaseController {
         };
 
         booksArr.push(obj);
-        // const pho = singlePhoto.forEach((item) => {
-        //   console.log(item.photoUrl);
-        // });
-        // console.log(pho);
       });
-
-      // const book = books.forEach((element) => {
-      //   console.log(element.dataValues);
-      // });
-      // const photos = await books.getPhoto();
       return res.json(booksArr);
     } catch (err) {
       return res.status(400).json({ error: true, msg: err });

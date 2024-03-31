@@ -39,18 +39,22 @@ class UsersController extends BaseController {
   }
 
   async insertUser(req, res) {
-    const { email, firstName, lastName, phone } = req.body;
+    const { userEmail, firstName, lastName } = req.body;
 
     try {
-      const newUser = this.model.create({
-        firstName: firstName,
-        lastName: lastName,
-        email: email,
-        phone: phone,
+      await this.model.findOrCreate({
+        where: {
+          email: userEmail,
+        },
+        first_name: firstName,
+        last_name: lastName,
       });
-      return res.json(newUser);
+      return res.json("succesful!");
     } catch (err) {
-      return res.status(400).json({ error: true, msg: err });
+      return res.status(400).json({
+        error: true,
+        msg: err,
+      });
     }
   }
 }

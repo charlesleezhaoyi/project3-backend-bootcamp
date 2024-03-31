@@ -4,30 +4,38 @@ require("dotenv").config();
 
 // importing Routers
 const UsersRouter = require("./routers/usersRouter");
+const PostsRouter = require("./routers/PostsRouter");
+const CategoriesRouter = require("./routers/CategoriesRouter");
 const BooksRouter = require("./routers/booksRouter");
-const CategoriesRouter = require("./routers/categoriesRouter");
 const RequestsRouter = require("./routers/requestsRouter");
+const CommentsRouter = require("./routers/CommentsRouter");
 
 // importing Controllers
 const UsersController = require("./controllers/usersController");
+const PostsController = require("./controllers/PostsController");
+const CategoriesController = require("./controllers/CategoriesController");
 const BooksController = require("./controllers/booksController");
-const CategoriesController = require("./controllers/categoriesController");
-const RequestsController = require("./controllers/requestsController");
+const RequestsController = require("./controllers/RequestsController");
+const CommentsController = require("./controllers/CommentsController");
 
 //importing DB
 const db = require("./db/models/index");
-const { user, book, photo, category, request } = db;
+const { user, category, book, comment, post, photo, request } = db;
 
 // Initializing Controllers
 const userController = new UsersController(user);
+const postsController = new PostsController(db);
+const categoriesController = new CategoriesController(category, db, book);
 const bookController = new BooksController(book, photo, category);
-const categoryController = new CategoriesController(category, book);
 const requestController = new RequestsController(request, book);
+const commentsController = new CommentsController(comment, post, user);
 
 // Initializing Routers
 const usersRouter = new UsersRouter(userController);
+const postsRouter = new PostsRouter(postsController);
+const categoriesRouter = new CategoriesRouter(categoriesController);
 const booksRouter = new BooksRouter(bookController);
-const categoriesRouter = new CategoriesRouter(categoryController);
+const commentsRouter = new CommentsRouter(commentsController);
 const requestsRouter = new RequestsRouter(requestController);
 
 const PORT = 3000;
@@ -41,7 +49,10 @@ app.use(express.json());
 
 // Enable and use usersRouter
 app.use("/users", usersRouter.routes());
+app.use("/posts", postsRouter.routes());
+app.use("/categories", categoriesRouter.routes());
 app.use("/books", booksRouter.routes());
+app.use("/comments", commentsRouter.routes());
 app.use("/categories", categoriesRouter.routes());
 app.use("/request", requestsRouter.routes());
 
