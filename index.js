@@ -15,7 +15,7 @@ const UsersController = require("./controllers/usersController");
 const PostsController = require("./controllers/PostsController");
 const CategoriesController = require("./controllers/CategoriesController");
 const BooksController = require("./controllers/booksController");
-const RequestsController = require("./controllers/RequestsController");
+const RequestsController = require("./controllers/requestsController");
 const CommentsController = require("./controllers/CommentsController");
 
 //importing DB
