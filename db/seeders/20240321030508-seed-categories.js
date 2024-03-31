@@ -19,8 +19,16 @@ module.exports = {
         created_at: new Date(),
         updated_at: new Date(),
       },
-      { name: "Fantasy", created_at: new Date(), updated_at: new Date() },
-      { name: "Mystery", created_at: new Date(), updated_at: new Date() },
+      {
+        name: "Fantasy",
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+      {
+        name: "Mystery",
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
       {
         name: "Romance",
         created_at: new Date(),
@@ -46,6 +54,12 @@ module.exports = {
         created_at: new Date(),
         updated_at: new Date(),
       },
+      {
+        name: "Others",
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+      { name: "Adventure", created_at: new Date(), updated_at: new Date() },
     ]);
   },
 
