@@ -1,9 +1,8 @@
-const BaseController = require("./baseController");
-
-class DonationsController extends BaseController {
-  constructor(model, userModel) {
-    super(model);
+class DonationsController {
+  constructor(donationModel, userModel, bookModel) {
+    this.donationModel = donationModel;
     this.userModel = userModel;
+    this.bookModel = bookModel;
   }
 
   async getDonations(req, res) {
@@ -23,6 +22,24 @@ class DonationsController extends BaseController {
       });
 
       return res.json(donorEmail);
+    } catch (err) {
+      return res.status(400).json({ error: true, msg: err });
+    }
+  }
+
+  async getDonationsOnUser(req, res) {
+    const { email } = req.params;
+    try {
+      const user = await this.userModel.findOne({
+        where: {
+          email: email,
+        },
+      });
+      const donations = await this.donationModel.findAll({
+        where: { donorId: user.id },
+        include: [{ model: this.bookModel, include: "photos" }],
+      });
+      return res.json(donations);
     } catch (err) {
       return res.status(400).json({ error: true, msg: err });
     }

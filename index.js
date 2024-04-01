@@ -37,7 +37,7 @@ const bookController = new BooksController(
 );
 const requestController = new RequestsController(request, donation, book, user);
 const commentsController = new CommentsController(comment, post, user);
-const donationsController = new DonationsController(donation, user);
+const donationsController = new DonationsController(donation, user, book);
 
 // Initializing Routers
 const usersRouter = new UsersRouter(userController);
