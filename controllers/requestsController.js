@@ -39,6 +39,10 @@ class RequestsController {
       });
       const requests = await this.requestModel.findAll({
         where: { donationId: donation.id },
+        include: {
+          model: this.donationModel,
+          include: [{ model: this.bookModel, include: "photos" }],
+        },
       });
       return res.json(requests);
     } catch (err) {
@@ -56,6 +60,10 @@ class RequestsController {
       });
       const requests = await this.requestModel.findAll({
         where: { beneId: user.id },
+        include: {
+          model: this.donationModel,
+          include: [{ model: this.bookModel, include: "photos" }],
+        },
       });
       return res.json(requests);
     } catch (err) {
