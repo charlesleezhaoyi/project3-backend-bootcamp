@@ -14,7 +14,7 @@ const DonationsRouter = require("./routers/donationsRouter");
 // importing Controllers
 const UsersController = require("./controllers/usersController");
 const PostsController = require("./controllers/PostsController");
-const CategoriesController = require("./controllers/CategoriesController");
+const CategoriesController = require("./controllers/categoriesController");
 const BooksController = require("./controllers/booksController");
 const RequestsController = require("./controllers/requestsController");
 const CommentsController = require("./controllers/CommentsController");

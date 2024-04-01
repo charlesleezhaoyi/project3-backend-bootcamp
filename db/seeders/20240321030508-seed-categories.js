@@ -46,22 +46,6 @@ module.exports = {
         created_at: new Date(),
         updated_at: new Date(),
       },
-      {
-        name: "History",
-        created_at: new Date(),
-        updated_at: new Date(),
-      },
-      {
-        name: "Self-Help",
-        created_at: new Date(),
-        updated_at: new Date(),
-      },
-      {
-        name: "Others",
-        created_at: new Date(),
-        updated_at: new Date(),
-      },
-      { name: "Adventure", created_at: new Date(), updated_at: new Date() },
     ]);
   },
 

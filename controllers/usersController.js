@@ -28,7 +28,7 @@ class UsersController extends BaseController {
   }
 
   async updateVerifiedUser(req, res) {
-    const { firstName, lastName, userEmail, phone } = req.body;
+    const { userEmail, firstName, lastName, phone } = req.body;
 
     try {
       const user = await this.model.findOne({
