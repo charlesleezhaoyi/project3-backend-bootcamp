@@ -1,27 +1,34 @@
 const BaseController = require("./baseController");
 
 class RequestsController extends BaseController {
-  constructor(model, bookModel) {
+  constructor(model, donationModel, bookModel, userModel) {
     super(model);
+    this.donationModel = donationModel;
     this.bookModel = bookModel;
+    this.userModel = userModel;
   }
 
   async insertRequest(req, res) {
-    const { id, title } = req.params;
-    const { content } = req.body;
+    const { id } = req.params;
+    const { content, email } = req.body;
     try {
-      // const requestedBook = await this.bookModel.findOne({
-      //   where: {
-      //     id: id,
-      //     title: title,
-      //   },
-      // });
-
-      const requestedContent = await this.model.create({
-        content: content,
+      const donationId = await this.donationModel.findOne({
+        where: {
+          book_id: id,
+        },
+        attributes: ["id"],
       });
 
-      return res.json(requestedContent);
+      const donorpk = await donationId.dataValues.id;
+      const bookDonor = await this.userModel.findOne({
+        where: {
+          email: email,
+        },
+        attributes: ["id"],
+      });
+      const userpk = await bookDonor.dataValues.id;
+
+      return res.json("Request submitted successfully!");
     } catch (err) {
       return res.status(400).json({ error: true, msg: err });
     }

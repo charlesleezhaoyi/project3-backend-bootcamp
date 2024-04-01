@@ -7,10 +7,7 @@ class RequestsRouter {
   }
 
   routes() {
-    router.get(
-      "/:id/:title",
-      this.controller.insertRequest.bind(this.controller)
-    );
+    router.post("/:id", this.controller.insertRequest.bind(this.controller));
     router.get("/", this.controller.getAllRequest.bind(this.controller));
 
     return router;

@@ -1,10 +1,12 @@
 const BaseController = require("./baseController");
 
 class BooksController extends BaseController {
-  constructor(model, photoModel, categoryModel) {
+  constructor(model, photoModel, categoryModel, donationModel, userModel) {
     super(model);
     this.photoModel = photoModel;
     this.categoryModel = categoryModel;
+    this.donationModel = donationModel;
+    this.userModel = userModel;
   }
 
   async insertBook(req, res) {
@@ -17,6 +19,7 @@ class BooksController extends BaseController {
       review,
       photoUrl,
       name,
+      email,
     } = req.body;
 
     try {
@@ -39,7 +42,13 @@ class BooksController extends BaseController {
         where: { name: name },
       });
 
+      const bookDonor = await this.userModel.findOne({
+        where: {
+          email: email,
+        },
+      });
       book.addCategory(bookCategory);
+      bookDonor.setDonor(book);
 
       return res.json(book);
     } catch (err) {
@@ -47,7 +56,6 @@ class BooksController extends BaseController {
     }
   }
 
-  // please leave the comments here for my future reference. I will remove it eventually
   async getAllBooks(req, res) {
     try {
       const books = await this.model.findAll({

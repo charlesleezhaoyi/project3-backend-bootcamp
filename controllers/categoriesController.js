@@ -1,12 +1,11 @@
 const BaseController = require("./baseController");
 
 class CategoriesController extends BaseController {
-  constructor(model, db, bookModel) {
+  constructor(model, db) {
     super(model);
     this.post = db.post;
     this.like = db.like;
     this.comment = db.comment;
-    this.bookModel = bookModel;
     this.sequelize = db.sequelize;
   }
 
