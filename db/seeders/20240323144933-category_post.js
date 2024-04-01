@@ -42,13 +42,13 @@ module.exports = {
       },
       {
         post_id: 3,
-        category_id: 2,
+        category_id: 28,
         created_at: new Date(),
         updated_at: new Date(),
       },
       {
         post_id: 3,
-        category_id: 4,
+        category_id: 27,
         created_at: new Date(),
         updated_at: new Date(),
       },
