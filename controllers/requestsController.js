@@ -29,10 +29,34 @@ class RequestsController {
     }
   }
 
-  async getAllRequest(req, res) {
+  async getAllRequestOnBook(req, res) {
+    const { bookId } = req.params;
     try {
-      const requests = await this.model.findAll({});
+      const donation = await this.donationModel.findOne({
+        where: {
+          bookId: bookId,
+        },
+      });
+      const requests = await this.requestModel.findAll({
+        where: { donationId: donation.id },
+      });
+      return res.json(requests);
+    } catch (err) {
+      return res.status(400).json({ error: true, msg: err });
+    }
+  }
 
+  async getAllRequestOnUser(req, res) {
+    const { email } = req.params;
+    try {
+      const user = await this.userModel.findOne({
+        where: {
+          email: email,
+        },
+      });
+      const requests = await this.requestModel.findAll({
+        where: { beneId: user.id },
+      });
       return res.json(requests);
     } catch (err) {
       return res.status(400).json({ error: true, msg: err });
