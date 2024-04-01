@@ -9,22 +9,15 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       this.belongsToMany(models.category, { through: "user_categories" });
-      this.hasMany(models.request);
-      this.hasMany(models.donation);
-      this.belongsToMany(models.book, {
-        as: "donor",
-        through: "donation",
-        foreignKey: "donorId",
-      });
-      this.belongsToMany(models.book, {
-        as: "bene",
-        through: "donation",
-        foreignKey: "beneId",
-      });
+      this.hasMany(models.request, { foreignKey: "beneId" });
       this.belongsToMany(models.donation, {
-        through: "request",
+        through: models.request,
+        as: "requesterDonation",
         foreignKey: "beneId",
+        otherKey: "donationId",
       });
+      this.hasMany(models.donation, { as: "donor", foreignKey: "donorId" });
+      this.hasMany(models.donation, { as: "bene", foreignKey: "beneId" });
       this.belongsToMany(models.post, {
         as: "commentedPosts",
         through: models.comment,

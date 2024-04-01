@@ -7,26 +7,23 @@ class RequestsController {
   }
 
   async insertRequest(req, res) {
-    const { id } = req.params;
-    const { content, email } = req.body;
+    const { bookId, content, email } = req.body;
     try {
-      const donationId = await this.donationModel.findOne({
+      const donation = await this.donationModel.findOne({
         where: {
-          book_id: id,
+          bookId: bookId,
         },
-        attributes: ["id"],
       });
-
-      const donorpk = await donationId.dataValues.id;
-      const bookDonor = await this.userModel.findOne({
+      const requester = await this.userModel.findOne({
         where: {
           email: email,
         },
-        attributes: ["id"],
       });
-      const userpk = await bookDonor.dataValues.id;
+      await requester.addRequesterDonation(donation, {
+        through: { content: content, status: "pending" },
+      });
 
-      return res.json("Request submitted successfully!");
+      return res.json("Request Created");
     } catch (err) {
       return res.status(400).json({ error: true, msg: err });
     }

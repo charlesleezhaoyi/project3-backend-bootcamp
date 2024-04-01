@@ -64,7 +64,7 @@ app.use("/categories", categoriesRouter.routes());
 app.use("/books", booksRouter.routes());
 app.use("/comments", commentsRouter.routes());
 app.use("/categories", categoriesRouter.routes());
-app.use("/books", requestsRouter.routes());
+app.use("/requests", requestsRouter.routes());
 app.use("/donations", donationsRouter.routes());
 
 app.listen(PORT, () => {
