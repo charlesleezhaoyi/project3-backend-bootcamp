@@ -1,8 +1,6 @@
-const BaseController = require("./baseController");
-
-class RequestsController extends BaseController {
-  constructor(model, donationModel, bookModel, userModel) {
-    super(model);
+class RequestsController {
+  constructor(requestModel, donationModel, bookModel, userModel) {
+    this.requestModel = requestModel;
     this.donationModel = donationModel;
     this.bookModel = bookModel;
     this.userModel = userModel;
