@@ -18,7 +18,7 @@ class RequestsController {
         { where: { beneId: beneId } }
       );
       return res.json("Okay");
-    } catch (error) {
+    } catch (err) {
       return res.status(400).json({ error: true, msg: err });
     }
   }
