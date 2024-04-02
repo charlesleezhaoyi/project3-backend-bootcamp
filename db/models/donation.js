@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.user, { as: "donor", foreignKey: "donorId" });
       this.belongsTo(models.book);
       this.hasMany(models.request);
+
       this.belongsToMany(models.user, {
         through: models.request,
         as: "DonationRequester",

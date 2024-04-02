@@ -15,7 +15,7 @@ class DonationsController {
         include: { model: this.userModel, as: "donor" },
       });
 
-      return res.json(donation);
+      return res.json(donation.donor.email);
     } catch (err) {
       return res.status(400).json({ error: true, msg: err });
     }
