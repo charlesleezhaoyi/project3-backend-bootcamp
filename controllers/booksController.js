@@ -92,12 +92,11 @@ class BooksController extends BaseController {
     try {
       const book = await this.model.findByPk(id, {
         include: [
+          this.photoModel,
+          this.categoryModel,
           {
-            model: this.photoModel,
-          },
-          {
-            model: this.categoryModel,
-            right: true,
+            model: this.donationModel,
+            include: { model: this.userModel, as: "donor" },
           },
         ],
       });
