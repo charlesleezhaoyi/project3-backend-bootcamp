@@ -1,9 +1,9 @@
 const BaseController = require("./baseController");
 const { Op } = require("sequelize");
 
-class BooksController extends BaseController {
+class BooksController {
   constructor(model, photoModel, categoryModel, donationModel, userModel) {
-    super(model);
+    this.model = model;
     this.photoModel = photoModel;
     this.categoryModel = categoryModel;
     this.donationModel = donationModel;
@@ -60,24 +60,13 @@ class BooksController extends BaseController {
   async getAllBooks(req, res) {
     try {
       const books = await this.model.findAll({
-        include: this.photoModel,
+        include: {
+          model: this.photoModel,
+          where: { index: 0 },
+          required: false,
+        },
       });
-
-      const booksArr = [];
-
-      books.forEach((item) => {
-        const singlePhoto = item.photos[0];
-
-        const obj = {
-          title: item.title,
-          author: item.author,
-          condition: item.condition,
-          photo: singlePhoto,
-        };
-
-        booksArr.push(obj);
-      });
-      return res.json(booksArr);
+      return res.json(books);
     } catch (err) {
       return res.status(400).json({ error: true, msg: err });
     }
