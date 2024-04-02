@@ -1,5 +1,5 @@
 const BaseController = require("./baseController");
-const { Sequelize, Op } = require("sequelize");
+const { Op } = require("sequelize");
 
 class BooksController extends BaseController {
   constructor(model, photoModel, categoryModel, donationModel, userModel) {
@@ -18,7 +18,7 @@ class BooksController extends BaseController {
       releasedYear,
       condition,
       review,
-      photoUrl,
+      photos,
       name,
       email,
     } = req.body;
@@ -32,29 +32,25 @@ class BooksController extends BaseController {
           releasedYear: releasedYear,
           condition: condition,
           review: review,
-          photos: photoUrl,
+          photos: photos,
         },
         {
           include: ["photos"],
         }
       );
-
       const bookCategory = await this.categoryModel.findAll({
         where: { name: name },
       });
-
       const bookDonor = await this.userModel.findOne({
         where: {
           email: email,
         },
       });
-
       await book.addCategory(bookCategory);
       await this.donationModel.create({
         bookId: book.id,
         donorId: bookDonor.id,
       });
-
       return res.json(book);
     } catch (err) {
       return res.status(400).json({ error: true, msg: err });
@@ -122,7 +118,6 @@ class BooksController extends BaseController {
 
       const books = data.map((book) => book.dataValues);
       res.json(books);
-      // res.status(200).json(data);
     } catch (error) {
       console.log(error);
       res.status(500).json({
