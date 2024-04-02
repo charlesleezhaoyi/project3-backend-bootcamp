@@ -1,28 +1,39 @@
-const BaseController = require("./baseController");
-
-class DonationsController extends BaseController {
-  constructor(model, userModel) {
-    super(model);
+class DonationsController {
+  constructor(donationModel, userModel, bookModel) {
+    this.donationModel = donationModel;
     this.userModel = userModel;
+    this.bookModel = bookModel;
   }
 
-  async getDonations(req, res) {
-    const { id } = req.params;
+  async getDonorEmail(req, res) {
+    const { bookId } = req.params;
     try {
-      const donor = await this.model.findOne({
+      const donation = await this.donationModel.findOne({
         where: {
-          bookId: id,
+          bookId: bookId,
         },
-        attributes: ["donor_id"],
+        include: { model: this.userModel, as: "donor" },
       });
 
-      const donorId = await donor.dataValues.donor_id;
+      return res.json(donation.donor.email);
+    } catch (err) {
+      return res.status(400).json({ error: true, msg: err });
+    }
+  }
 
-      const donorEmail = await this.userModel.findByPk(donorId, {
-        attributes: ["email"],
+  async getDonationsOnUser(req, res) {
+    const { email } = req.params;
+    try {
+      const user = await this.userModel.findOne({
+        where: {
+          email: email,
+        },
       });
-
-      return res.json(donorEmail);
+      const donations = await this.donationModel.findAll({
+        where: { donorId: user.id },
+        include: [{ model: this.bookModel, include: "photos" }],
+      });
+      return res.json(donations);
     } catch (err) {
       return res.status(400).json({ error: true, msg: err });
     }

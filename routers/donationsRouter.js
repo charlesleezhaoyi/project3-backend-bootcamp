@@ -7,7 +7,14 @@ class DonationsRouter {
   }
 
   routes() {
-    router.get("/:id", this.controller.getDonations.bind(this.controller));
+    router.get(
+      "/user/:email",
+      this.controller.getDonationsOnUser.bind(this.controller)
+    );
+    router.get(
+      "/donor/:bookId",
+      this.controller.getDonorEmail.bind(this.controller)
+    );
 
     return router;
   }

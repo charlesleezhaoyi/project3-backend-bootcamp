@@ -48,8 +48,12 @@ class BooksController extends BaseController {
           email: email,
         },
       });
-      book.addCategory(bookCategory);
-      bookDonor.setDonor(book);
+
+      await book.addCategory(bookCategory);
+      await this.donationModel.create({
+        bookId: book.id,
+        donorId: bookDonor.id,
+      });
 
       return res.json(book);
     } catch (err) {
