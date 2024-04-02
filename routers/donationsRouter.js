@@ -11,7 +11,10 @@ class DonationsRouter {
       "/user/:email",
       this.controller.getDonationsOnUser.bind(this.controller)
     );
-    router.get("/:bookId", this.controller.getDonorEmail.bind(this.controller));
+    router.get(
+      "/donor/:bookId",
+      this.controller.getDonorEmail.bind(this.controller)
+    );
 
     return router;
   }
