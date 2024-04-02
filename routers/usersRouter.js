@@ -7,8 +7,15 @@ class UsersRouter {
   }
 
   routes() {
-    router.post("/", this.controller.insertUser.bind(this.controller));
-    router.put("/", this.controller.updateUser.bind(this.controller));
+    router.post(
+      "/",
+      this.controller.insertUnverifiedUser.bind(this.controller)
+    );
+    router.put("/", this.controller.updateVerifiedUser.bind(this.controller));
+    router.post(
+      "/addCategory",
+      this.controller.addCategoryToUser.bind(this.controller)
+    );
     return router;
   }
 }

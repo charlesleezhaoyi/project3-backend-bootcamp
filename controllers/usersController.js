@@ -1,23 +1,24 @@
 const BaseController = require("./baseController");
 
 class UsersController extends BaseController {
-  constructor(model) {
+  constructor(model, category) {
     super(model);
+    this.category = category;
   }
 
-  async insertUser(req, res) {
-    const { email, firstName, lastName, phone } = req.body;
+  async insertUnverifiedUser(req, res) {
+    const { email } = req.body;
 
     try {
-      const user = await this.model.findOrCreate({
-        where: { email: email },
-        defaults: {
-          firstName: firstName,
-          lastName: lastName,
-          phone: phone,
+      await this.model.findOrCreate({
+        where: {
+          email: email,
         },
       });
-      return res.json(user);
+
+      return res.status(200).json({
+        message: "User created",
+      });
     } catch (err) {
       return res.status(400).json({
         error: true,
@@ -26,31 +27,66 @@ class UsersController extends BaseController {
     }
   }
 
-  async updateUser(req, res) {
+  async updateVerifiedUser(req, res) {
     const { email, firstName, lastName, phone } = req.body;
 
     try {
-      const updatedUser = await this.model.update(
-        {
+      const user = await this.model.findOne({
+        where: {
           email: email,
-          firstName: firstName,
-          lastName: lastName,
-          phone: phone,
         },
-        {
-          where: {
-            email: email,
-          },
-        }
-      );
+      });
 
-      return res.json(updatedUser);
-    } catch (err) {
-      return res.status(400).json({
-        error: true,
-        msg: err,
+      if (user) {
+        await this.model.update(
+          { firstName, lastName, phone },
+          { where: { email: email } }
+        );
+
+        return res.status(200).send({ message: "User updated successfully." });
+      } else {
+        return res.status(404).send({ message: "User not found." });
+      }
+    } catch (error) {
+      return res
+        .status(500)
+        .send({ message: "Error updating user.", error: error.message });
+    }
+  }
+
+  async addCategoryToUser(req, res) {
+    const { userId, categoryId } = req.body;
+
+    try {
+      const user = await this.model.findOne({
+        where: {
+          id: userId,
+        },
+      });
+
+      console.log(userId);
+      console.log(user);
+
+      if (user) {
+        const categoryInstance = await this.category.findByPk(categoryId);
+
+        if (categoryInstance) {
+          await user.addCategory(categoryInstance);
+          return res.status(200).send({ message: "Category added to user." });
+        } else {
+          return res.status(404).send({ message: "Category not found." });
+        }
+      } else {
+        return res.status(404).send({ message: "User not found." });
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({
+        message: "Error adding category to user.",
+        error: error.message,
       });
     }
   }
 }
+
 module.exports = UsersController;
