@@ -7,12 +7,12 @@ class UsersController extends BaseController {
   }
 
   async insertUnverifiedUser(req, res) {
-    const { userEmail } = req.body;
+    const { email } = req.body;
 
     try {
       await this.model.findOrCreate({
         where: {
-          email: userEmail,
+          email: email,
         },
       });
 
@@ -28,19 +28,19 @@ class UsersController extends BaseController {
   }
 
   async updateVerifiedUser(req, res) {
-    const { userEmail, firstName, lastName, phone } = req.body;
+    const { email, firstName, lastName, phone } = req.body;
 
     try {
       const user = await this.model.findOne({
         where: {
-          email: userEmail,
+          email: email,
         },
       });
 
       if (user) {
         await this.model.update(
           { firstName, lastName, phone },
-          { where: { email: userEmail } }
+          { where: { email: email } }
         );
 
         return res.status(200).send({ message: "User updated successfully." });
