@@ -5,23 +5,17 @@ class DonationsController {
     this.bookModel = bookModel;
   }
 
-  async getDonations(req, res) {
-    const { id } = req.params;
+  async getDonorEmail(req, res) {
+    const { bookId } = req.params;
     try {
-      const donor = await this.model.findOne({
+      const donation = await this.donationModel.findOne({
         where: {
-          bookId: id,
+          bookId: bookId,
         },
-        attributes: ["donor_id"],
+        include: { model: this.userModel, as: "donor" },
       });
 
-      const donorId = await donor.dataValues.donor_id;
-
-      const donorEmail = await this.userModel.findByPk(donorId, {
-        attributes: ["email"],
-      });
-
-      return res.json(donorEmail);
+      return res.json(donation);
     } catch (err) {
       return res.status(400).json({ error: true, msg: err });
     }
