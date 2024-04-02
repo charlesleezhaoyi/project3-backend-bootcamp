@@ -7,8 +7,15 @@ class RequestsRouter {
   }
 
   routes() {
-    router.post("/:id", this.controller.insertRequest.bind(this.controller));
-    router.get("/", this.controller.getAllRequest.bind(this.controller));
+    router.get(
+      "/book/:bookId",
+      this.controller.getAllRequestOnBook.bind(this.controller)
+    );
+    router.get(
+      "/user/:email",
+      this.controller.getAllRequestOnUser.bind(this.controller)
+    );
+    router.post("/", this.controller.insertRequest.bind(this.controller));
 
     return router;
   }
