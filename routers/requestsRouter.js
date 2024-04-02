@@ -16,7 +16,7 @@ class RequestsRouter {
       this.controller.getAllRequestOnUser.bind(this.controller)
     );
     router.post("/", this.controller.insertRequest.bind(this.controller));
-
+    router.post("/accept", this.controller.acceptRequest.bind(this.controller));
     return router;
   }
 }
