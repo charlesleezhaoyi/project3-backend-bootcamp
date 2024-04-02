@@ -19,7 +19,7 @@ class BooksController extends BaseController {
       condition,
       review,
       photos,
-      name,
+      categories,
       email,
     } = req.body;
 
@@ -39,14 +39,14 @@ class BooksController extends BaseController {
         }
       );
       const bookCategory = await this.categoryModel.findAll({
-        where: { name: name },
+        where: { name: { [Op.or]: categories } },
       });
       const bookDonor = await this.userModel.findOne({
         where: {
           email: email,
         },
       });
-      await book.addCategory(bookCategory);
+      await book.addCategories(bookCategory);
       await this.donationModel.create({
         bookId: book.id,
         donorId: bookDonor.id,
