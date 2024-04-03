@@ -69,6 +69,25 @@ class BooksController {
     }
   }
 
+  async getBookByCategory(req, res) {
+    const { category } = req.params;
+    try {
+      const selectedBooks = await this.model.findAll({
+        include: [
+          { model: this.categoryModel, where: { name: category } },
+          {
+            model: this.photoModel,
+            where: { index: 0 },
+            required: false,
+          },
+        ],
+      });
+      return res.json(selectedBooks);
+    } catch (err) {
+      return res.status(400).json({ error: true, msg: err });
+    }
+  }
+
   async getBook(req, res) {
     const { id } = req.params;
     try {
