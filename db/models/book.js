@@ -10,7 +10,6 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       this.belongsToMany(models.category, { through: "category_books" });
       this.hasMany(models.photo, { onDelete: "CASCADE" });
-
       this.hasOne(models.donation);
     }
   }

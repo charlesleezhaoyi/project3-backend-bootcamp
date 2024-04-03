@@ -1,58 +1,52 @@
-const BaseController = require("./baseController");
 const { Op } = require("sequelize");
+const fs = require("fs");
 
 class BooksController {
-  constructor(model, photoModel, categoryModel, donationModel, userModel) {
-    this.model = model;
-    this.photoModel = photoModel;
-    this.categoryModel = categoryModel;
-    this.donationModel = donationModel;
-    this.userModel = userModel;
+  constructor(db) {
+    this.model = db.book;
+    this.photoModel = db.photo;
+    this.categoryModel = db.category;
+    this.donationModel = db.donation;
+    this.userModel = db.user;
+    this.sequelize = db.sequelize;
   }
 
   async insertBook(req, res) {
-    const {
-      title,
-      author,
-      description,
-      releasedYear,
-      condition,
-      review,
-      photos,
-      categories,
-      email,
-    } = req.body;
-
+    const { categories, email, ...data } = JSON.parse(req.body.data);
+    const t = await this.sequelize.transaction();
     try {
-      const book = await this.model.create(
-        {
-          title: title,
-          author: author,
-          description: description,
-          releasedYear: releasedYear,
-          condition: condition,
-          review: review,
-          photos: photos,
-        },
-        {
-          include: ["photos"],
-        }
-      );
+      const book = await this.model.create(data, { transaction: t });
+      for (const [index, { path }] of req.files.entries()) {
+        const photoBinaryData = fs.readFileSync(path);
+        await this.photoModel.create(
+          {
+            index: index,
+            bookId: book.id,
+            file: photoBinaryData,
+          },
+          { transaction: t }
+        );
+      }
       const bookCategory = await this.categoryModel.findAll({
-        where: { name: { [Op.or]: categories } },
+        where: { name: categories },
       });
       const bookDonor = await this.userModel.findOne({
         where: {
           email: email,
         },
       });
-      await book.addCategories(bookCategory);
-      await this.donationModel.create({
-        bookId: book.id,
-        donorId: bookDonor.id,
-      });
+      await book.addCategories(bookCategory, { transaction: t });
+      await this.donationModel.create(
+        {
+          bookId: book.id,
+          donorId: bookDonor.id,
+        },
+        { transaction: t }
+      );
+      await t.commit();
       return res.json(book);
     } catch (err) {
+      await t.rollback();
       return res.status(400).json({ error: true, msg: err });
     }
   }
