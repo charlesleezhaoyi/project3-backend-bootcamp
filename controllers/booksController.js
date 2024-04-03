@@ -26,7 +26,9 @@ class BooksController {
           },
           { transaction: t }
         );
+        fs.unlinkSync(path);
       }
+
       const bookCategory = await this.categoryModel.findAll({
         where: { name: categories },
       });
@@ -43,6 +45,7 @@ class BooksController {
         },
         { transaction: t }
       );
+
       await t.commit();
       return res.json(book);
     } catch (err) {

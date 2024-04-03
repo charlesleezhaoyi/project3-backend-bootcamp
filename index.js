@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 let multer = require("multer");
-const upload = multer({ dest: "uploads/" });
+const upload = multer({ dest: "multer/" });
 require("dotenv").config();
 
 // importing Routers
