@@ -1,5 +1,7 @@
 const express = require("express");
 const cors = require("cors");
+let multer = require("multer");
+const upload = multer({ dest: "multer/" });
 require("dotenv").config();
 
 // importing Routers
@@ -22,19 +24,13 @@ const DonationsController = require("./controllers/donationsController");
 
 //importing DB
 const db = require("./db/models/index");
-const { user, category, book, comment, post, photo, request, donation } = db;
+const { user, category, book, comment, post, request, donation } = db;
 
 // Initializing Controllers
 const userController = new UsersController(user, category);
 const postsController = new PostsController(db);
 const categoriesController = new CategoriesController(category, db, book);
-const bookController = new BooksController(
-  book,
-  photo,
-  category,
-  donation,
-  user
-);
+const bookController = new BooksController(db);
 const requestController = new RequestsController(request, donation, book, user);
 const commentsController = new CommentsController(comment, post, user);
 const donationsController = new DonationsController(donation, user, book);
@@ -43,7 +39,7 @@ const donationsController = new DonationsController(donation, user, book);
 const usersRouter = new UsersRouter(userController);
 const postsRouter = new PostsRouter(postsController);
 const categoriesRouter = new CategoriesRouter(categoriesController);
-const booksRouter = new BooksRouter(bookController);
+const booksRouter = new BooksRouter(bookController, upload);
 const commentsRouter = new CommentsRouter(commentsController);
 const requestsRouter = new RequestsRouter(requestController);
 const donationsRouter = new DonationsRouter(donationsController);

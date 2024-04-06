@@ -1,62 +1,55 @@
-const BaseController = require("./baseController");
-const { Sequelize, Op } = require("sequelize");
+const { Op } = require("sequelize");
+const fs = require("fs");
 
-class BooksController extends BaseController {
-  constructor(model, photoModel, categoryModel, donationModel, userModel) {
-    super(model);
-    this.photoModel = photoModel;
-    this.categoryModel = categoryModel;
-    this.donationModel = donationModel;
-    this.userModel = userModel;
+class BooksController {
+  constructor(db) {
+    this.model = db.book;
+    this.photoModel = db.photo;
+    this.categoryModel = db.category;
+    this.donationModel = db.donation;
+    this.userModel = db.user;
+    this.sequelize = db.sequelize;
   }
 
   async insertBook(req, res) {
-    const {
-      title,
-      author,
-      description,
-      releasedYear,
-      condition,
-      review,
-      photoUrl,
-      name,
-      email,
-    } = req.body;
-
+    const { categories, email, ...data } = JSON.parse(req.body.data);
+    const t = await this.sequelize.transaction();
     try {
-      const book = await this.model.create(
-        {
-          title: title,
-          author: author,
-          description: description,
-          releasedYear: releasedYear,
-          condition: condition,
-          review: review,
-          photos: photoUrl,
-        },
-        {
-          include: ["photos"],
-        }
-      );
+      const book = await this.model.create(data, { transaction: t });
+      for (const [index, { path }] of req.files.entries()) {
+        const photoBinaryData = fs.readFileSync(path);
+        await this.photoModel.create(
+          {
+            index: index,
+            bookId: book.id,
+            file: photoBinaryData,
+          },
+          { transaction: t }
+        );
+        fs.unlinkSync(path);
+      }
 
       const bookCategory = await this.categoryModel.findAll({
-        where: { name: name },
+        where: { name: categories },
       });
-
       const bookDonor = await this.userModel.findOne({
         where: {
           email: email,
         },
       });
+      await book.addCategories(bookCategory, { transaction: t });
+      await this.donationModel.create(
+        {
+          bookId: book.id,
+          donorId: bookDonor.id,
+        },
+        { transaction: t }
+      );
 
-      await book.addCategory(bookCategory);
-      await this.donationModel.create({
-        bookId: book.id,
-        donorId: bookDonor.id,
-      });
-
+      await t.commit();
       return res.json(book);
     } catch (err) {
+      await t.rollback();
       return res.status(400).json({ error: true, msg: err });
     }
   }
@@ -64,24 +57,32 @@ class BooksController extends BaseController {
   async getAllBooks(req, res) {
     try {
       const books = await this.model.findAll({
-        include: this.photoModel,
+        include: {
+          model: this.photoModel,
+          where: { index: 0 },
+          required: false,
+        },
       });
+      return res.json(books);
+    } catch (err) {
+      return res.status(400).json({ error: true, msg: err });
+    }
+  }
 
-      const booksArr = [];
-
-      books.forEach((item) => {
-        const singlePhoto = item.photos[0];
-
-        const obj = {
-          title: item.title,
-          author: item.author,
-          condition: item.condition,
-          photo: singlePhoto,
-        };
-
-        booksArr.push(obj);
+  async getBookByCategory(req, res) {
+    const { category } = req.params;
+    try {
+      const selectedBooks = await this.model.findAll({
+        include: [
+          { model: this.categoryModel, where: { name: category } },
+          {
+            model: this.photoModel,
+            where: { index: 0 },
+            required: false,
+          },
+        ],
       });
-      return res.json(booksArr);
+      return res.json(selectedBooks);
     } catch (err) {
       return res.status(400).json({ error: true, msg: err });
     }
@@ -92,12 +93,11 @@ class BooksController extends BaseController {
     try {
       const book = await this.model.findByPk(id, {
         include: [
+          this.photoModel,
+          this.categoryModel,
           {
-            model: this.photoModel,
-          },
-          {
-            model: this.categoryModel,
-            right: true,
+            model: this.donationModel,
+            include: { model: this.userModel, as: "donor" },
           },
         ],
       });
@@ -123,7 +123,6 @@ class BooksController extends BaseController {
 
       const books = data.map((book) => book.dataValues);
       res.json(books);
-      // res.status(200).json(data);
     } catch (error) {
       console.log(error);
       res.status(500).json({

@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   photo.init(
     {
-      photoUrl: DataTypes.STRING,
+      file: DataTypes.BLOB,
       bookId: {
         type: DataTypes.INTEGER,
         references: {

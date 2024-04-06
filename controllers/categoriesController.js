@@ -20,21 +20,6 @@ class CategoriesController extends BaseController {
     }
   }
 
-  async getCategory(req, res) {
-    const { category } = req.params;
-    try {
-      const selectedCategory = await this.model.findOne({
-        where: {
-          name: category,
-        },
-      });
-      const selectedBooks = await selectedCategory.getBooks();
-      return res.json(selectedBooks);
-    } catch (err) {
-      return res.status(400).json({ error: true, msg: err });
-    }
-  }
-
   async getSortedCategories(req, res) {
     const { sortBy } = req.params;
     const sortByList = [
