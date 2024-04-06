@@ -7,6 +7,7 @@ class UsersRouter {
   }
 
   routes() {
+    router.get("/:email", this.controller.getUserByEmail.bind(this.controller));
     router.post(
       "/",
       this.controller.insertUnverifiedUser.bind(this.controller)
