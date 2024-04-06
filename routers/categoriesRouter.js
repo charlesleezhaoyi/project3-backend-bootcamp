@@ -9,7 +9,6 @@ class CategoriesRouter {
   routes() {
     router.get("/", this.controller.getCategories.bind(this.controller));
     router.get("/all", this.controller.getAll.bind(this.controller));
-    router.get("/:category", this.controller.getCategory.bind(this.controller));
     router.get(
       "/all/sort/:sortBy",
       this.controller.getSortedCategories.bind(this.controller)
