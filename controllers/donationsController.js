@@ -31,7 +31,7 @@ class DonationsController {
       });
       const donations = await this.donationModel.findAll({
         where: { donorId: user.id },
-        include: [{ model: this.bookModel, include: "photos" }],
+        include: [{ model: this.bookModel }],
       });
       return res.json(donations);
     } catch (err) {
