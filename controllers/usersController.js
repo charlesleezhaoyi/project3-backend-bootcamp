@@ -1,9 +1,20 @@
-const BaseController = require("./baseController");
-
-class UsersController extends BaseController {
+class UsersController {
   constructor(model, category) {
-    super(model);
+    this.model = model;
     this.category = category;
+  }
+
+  async getUserByEmail(req, res) {
+    const { email } = req.params;
+    try {
+      const data = await this.model.findOne({ where: { email: email } });
+      return res.json(data);
+    } catch (err) {
+      return res.status(400).json({
+        error: true,
+        msg: err,
+      });
+    }
   }
 
   async insertUnverifiedUser(req, res) {
