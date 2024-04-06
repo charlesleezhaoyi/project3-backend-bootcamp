@@ -76,7 +76,7 @@ class RequestsController {
         where: { beneId: user.id },
         include: {
           model: this.donationModel,
-          include: [{ model: this.bookModel, include: "photos" }],
+          include: [{ model: this.bookModel }],
         },
       });
       return res.json(requests);
