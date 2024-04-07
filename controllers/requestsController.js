@@ -12,6 +12,17 @@ class RequestsController {
   //Need to update this function later
   async acceptRequest(req, res) {
     const { beneId, bookId } = req.body;
+    const smsConsent = await this.userModel.findOne({
+      where: { id: beneId, smsConsent: true },
+    });
+
+    const recipientNumber = await this.userModel.findOne({
+      where: { id: beneId },
+      attributes: ["phone"],
+    });
+
+    console.log(req.body);
+    console.log(recipientNumber.phone);
     try {
       await this.donationModel.update(
         { beneId: beneId },
@@ -21,14 +32,6 @@ class RequestsController {
         { status: "accepted" },
         { where: { beneId: beneId } }
       );
-      const smsConsent = await this.userModel.findOne({
-        where: { Id: beneId, smsConsent: true },
-      });
-
-      const recipientNumber = await this.userModel.findOne({
-        where: { Id: beneId },
-        attributes: ["phone"],
-      });
 
       if (smsConsent) {
         client.messages.create({
