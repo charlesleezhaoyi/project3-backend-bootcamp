@@ -66,6 +66,21 @@ class RequestsController {
     }
   }
 
+  async changeRequestStatus(req, res) {
+    const { beneId, donationId, status } = req.body;
+    try {
+      await this.requestModel.update(
+        { status: status },
+        {
+          where: { [Op.and]: [{ beneId: beneId }, { donationId: donationId }] },
+        }
+      );
+      return res.json("Okay");
+    } catch (err) {
+      return res.status(400).json({ error: true, msg: err });
+    }
+  }
+
   async getAllRequestOnBook(req, res) {
     const { bookId } = req.params;
     try {
