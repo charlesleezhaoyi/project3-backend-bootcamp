@@ -1,6 +1,7 @@
 const twilo_account_Sid = process.env.DB_TWILIO_ACCOUNT_SID;
 const twilo_auth_token = process.env.DB_TWILIO_AUTH_TOKEN;
 const client = require("twilio")(twilo_account_Sid, twilo_auth_token);
+const { Op } = require("sequelize");
 
 class RequestsController {
   constructor(requestModel, donationModel, bookModel, userModel) {
