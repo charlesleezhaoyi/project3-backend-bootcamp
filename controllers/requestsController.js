@@ -1,3 +1,7 @@
+const twilo_account_Sid = process.env.DB_TWILIO_ACCOUNT_SID;
+const twilo_auth_token = process.env.DB_TWILIO_AUTH_TOKEN;
+const client = require("twilio")(twilo_account_Sid, twilo_auth_token);
+
 class RequestsController {
   constructor(requestModel, donationModel, bookModel, userModel) {
     this.requestModel = requestModel;
@@ -17,7 +21,23 @@ class RequestsController {
         { status: "accepted" },
         { where: { beneId: beneId } }
       );
-      return res.json("Okay");
+      const smsConsent = await this.userModel.findOne({
+        where: { Id: beneId, smsConsent: true },
+      });
+
+      const recipientNumber = await this.userModel.findOne({
+        where: { Id: beneId },
+        attributes: ["phone"],
+      });
+
+      if (smsConsent) {
+        client.messages.create({
+          body: "Your request has been accepted. Please text this number (donor number) to arrange a pick up time & location.",
+          from: process.env.DB_TWILIO_TEST_NUMBER,
+          to: recipientNumber.phone,
+        });
+      }
+      return res.json("Request accepted");
     } catch (err) {
       return res.status(400).json({ error: true, msg: err });
     }
