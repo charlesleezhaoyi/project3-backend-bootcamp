@@ -1,3 +1,5 @@
+const { Op } = require("sequelize");
+
 class RequestsController {
   constructor(requestModel, donationModel, bookModel, userModel) {
     this.requestModel = requestModel;
@@ -41,6 +43,21 @@ class RequestsController {
       });
 
       return res.json("Request Created");
+    } catch (err) {
+      return res.status(400).json({ error: true, msg: err });
+    }
+  }
+
+  async changeRequestStatus(req, res) {
+    const { beneId, donationId, status } = req.body;
+    try {
+      await this.requestModel.update(
+        { status: status },
+        {
+          where: { [Op.and]: [{ beneId: beneId }, { donationId: donationId }] },
+        }
+      );
+      return res.json("Okay");
     } catch (err) {
       return res.status(400).json({ error: true, msg: err });
     }
