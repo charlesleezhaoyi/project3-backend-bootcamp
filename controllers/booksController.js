@@ -108,21 +108,23 @@ class BooksController {
   }
 
   async getRelatedBooks(req, res) {
-    const { searchTerm } = req.params;
-
+    // const { searchTerm } = req.params;
+    const info = req.query.q;
     try {
       const data = await this.model.findAll({
         where: {
           [Op.or]: [
-            { title: { [Op.like]: `%${searchTerm}%` } },
-            { author: { [Op.like]: `%${searchTerm}%` } },
+            { title: { [Op.like]: `%${info}%` } },
+            { author: { [Op.like]: `%${info}%` } },
           ],
         },
       });
       console.log(data);
 
-      const books = data.map((book) => book.dataValues);
-      res.json(books);
+      // const books = data.map((book) => book.dataValues);
+      // console.log(books);
+      return res.json(data);
+      // res.status(200).json(data);
     } catch (error) {
       console.log(error);
       res.status(500).json({
