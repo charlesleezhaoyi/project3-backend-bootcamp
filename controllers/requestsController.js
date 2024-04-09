@@ -1,3 +1,6 @@
+const twilo_account_Sid = process.env.DB_TWILIO_ACCOUNT_SID;
+const twilo_auth_token = process.env.DB_TWILIO_AUTH_TOKEN;
+const client = require("twilio")(twilo_account_Sid, twilo_auth_token);
 const { Op } = require("sequelize");
 
 class RequestsController {
@@ -10,7 +13,18 @@ class RequestsController {
   //Need to update this function later
   async acceptRequest(req, res) {
     const { beneId, bookId } = req.body;
+
+    console.log(req.body);
     try {
+      const smsConsent = await this.userModel.findOne({
+        where: { id: beneId, smsConsent: true },
+      });
+
+      const recipientNumber = await this.userModel.findOne({
+        where: { id: beneId },
+        attributes: ["phone"],
+      });
+
       await this.donationModel.update(
         { beneId: beneId },
         { where: { bookId: bookId } }
@@ -19,7 +33,15 @@ class RequestsController {
         { status: "accepted" },
         { where: { beneId: beneId } }
       );
-      return res.json("Okay");
+
+      if (smsConsent) {
+        client.messages.create({
+          body: "Your request has been accepted. Please text this number (donor number) to arrange a pick up time & location.",
+          from: process.env.DB_TWILIO_TEST_NUMBER,
+          to: recipientNumber.phone,
+        });
+      }
+      return res.json("Request accepted");
     } catch (err) {
       return res.status(400).json({ error: true, msg: err });
     }
