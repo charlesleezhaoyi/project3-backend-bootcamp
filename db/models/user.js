@@ -44,6 +44,7 @@ module.exports = (sequelize, DataTypes) => {
       phone: DataTypes.INTEGER,
       photoUrl: DataTypes.STRING,
       smsConsent: DataTypes.BOOLEAN,
+      emailConsent: DataTypes.BOOLEAN,
     },
     {
       sequelize,

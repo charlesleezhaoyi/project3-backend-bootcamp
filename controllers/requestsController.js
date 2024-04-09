@@ -2,6 +2,12 @@ const twilo_account_Sid = process.env.DB_TWILIO_ACCOUNT_SID;
 const twilo_auth_token = process.env.DB_TWILIO_AUTH_TOKEN;
 const client = require("twilio")(twilo_account_Sid, twilo_auth_token);
 const { Op } = require("sequelize");
+const Mailjet = require("node-mailjet");
+const mailjet = Mailjet.apiConnect(
+  process.env.MAILJET_API_KEY,
+  process.env.MAILJET_SECRET_KEY
+);
+const mailjetRequest = mailjet.post("send", { version: "v3.1" });
 
 class RequestsController {
   constructor(requestModel, donationModel, bookModel, userModel) {
@@ -10,35 +16,51 @@ class RequestsController {
     this.bookModel = bookModel;
     this.userModel = userModel;
   }
-  //Need to update this function later
+
   async acceptRequest(req, res) {
     const { beneId, bookId } = req.body;
 
-    console.log(req.body);
     try {
-      const smsConsent = await this.userModel.findOne({
-        where: { id: beneId, smsConsent: true },
-      });
-
-      const recipientNumber = await this.userModel.findOne({
+      const recipient = await this.userModel.findOne({
         where: { id: beneId },
-        attributes: ["phone"],
+      });
+      const donation = await this.donationModel.findOne({
+        where: { bookId: bookId },
+        include: [{ model: this.userModel, as: "donor" }, this.bookModel],
       });
 
-      await this.donationModel.update(
-        { beneId: beneId },
-        { where: { bookId: bookId } }
-      );
+      await donation.update({ beneId: beneId });
+
       await this.requestModel.update(
         { status: "accepted" },
         { where: { beneId: beneId } }
       );
 
-      if (smsConsent) {
-        client.messages.create({
-          body: "Your request has been accepted. Please text this number (donor number) to arrange a pick up time & location.",
+      if (recipient.smsConsent && recipient.phone) {
+        await client.messages.create({
+          body: `Your request has been accepted. Please contact this number ${donation.donor.phone} or email ${donation.donor.email} to arrange a pick up time & location.`,
           from: process.env.DB_TWILIO_TEST_NUMBER,
-          to: recipientNumber.phone,
+          to: recipient.phone,
+        });
+      }
+      if (recipient.emailConsent) {
+        await mailjetRequest.request({
+          Messages: [
+            {
+              From: {
+                Email: process.env.MAILJET_SENDER,
+                Name: "Book Swap",
+              },
+              To: [
+                {
+                  Email: recipient.email,
+                  Name: `${recipient.firstName} ${recipient.lastName}`,
+                },
+              ],
+              Subject: "Book request accepted notification",
+              TextPart: `Congrats, Request for ${donation.book.title} is accepted by donor. Please contact this number ${donation.donor.phone} or email ${donation.donor.email} to arrange a pick up time & location.`,
+            },
+          ],
         });
       }
       return res.json("Request accepted");
