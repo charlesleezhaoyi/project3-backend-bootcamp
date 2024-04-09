@@ -19,10 +19,6 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    await queryInterface.removeColumn(
-      "users",
-      "sms_consent",
-      Sequelize.BOOLEAN
-    );
+    await queryInterface.removeColumn("users", "sms_consent");
   },
 };
