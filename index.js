@@ -21,6 +21,7 @@ const BooksController = require("./controllers/booksController");
 const RequestsController = require("./controllers/requestsController");
 const CommentsController = require("./controllers/CommentsController");
 const DonationsController = require("./controllers/donationsController");
+const mailjetController = require("./controllers/mailjetController");
 
 //importing DB
 const db = require("./db/models/index");
@@ -62,6 +63,7 @@ app.use("/comments", commentsRouter.routes());
 app.use("/categories", categoriesRouter.routes());
 app.use("/requests", requestsRouter.routes());
 app.use("/donations", donationsRouter.routes());
+app.use("/api", mailjetController);
 
 app.listen(PORT, () => {
   console.log(`Express app listening on port ${PORT}!`);
