@@ -39,7 +39,7 @@ class UsersController {
   }
 
   async updateVerifiedUser(req, res) {
-    const { email, firstName, lastName, phone } = req.body;
+    const { email, firstName, lastName, phone, smsConsent } = req.body;
 
     try {
       const user = await this.model.findOne({
@@ -50,9 +50,10 @@ class UsersController {
 
       if (user) {
         await this.model.update(
-          { firstName, lastName, phone },
+          { firstName, lastName, phone, smsConsent },
           { where: { email: email } }
         );
+        console.log(req.body);
 
         return res.status(200).send({ message: "User updated successfully." });
       } else {
