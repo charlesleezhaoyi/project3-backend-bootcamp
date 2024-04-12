@@ -2,8 +2,9 @@ const express = require("express");
 const router = express.Router();
 
 class PostsRouter {
-  constructor(controller) {
+  constructor(controller, checkJwt) {
     this.controller = controller;
+    this.checkJwt = checkJwt;
   }
 
   routes() {
