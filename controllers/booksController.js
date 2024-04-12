@@ -114,10 +114,11 @@ class BooksController {
       const data = await this.model.findAll({
         where: {
           [Op.or]: [
-            { title: { [Op.like]: `%${info}%` } },
-            { author: { [Op.like]: `%${info}%` } },
+            { title: { [Op.iLike]: `%${info}%` } },
+            { author: { [Op.iLike]: `%${info}%` } },
           ],
         },
+        include: this.photoModel,
       });
       console.log(data);
 
