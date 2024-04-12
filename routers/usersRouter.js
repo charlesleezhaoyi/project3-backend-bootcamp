@@ -4,7 +4,6 @@ const router = express.Router();
 class UsersRouter {
   constructor(controller) {
     this.controller = controller;
-    // this.checkJwt = checkJwt;
   }
 
   routes() {

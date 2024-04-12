@@ -23,7 +23,7 @@ class RequestsRouter {
       this.checkJwt,
       this.controller.insertRequest.bind(this.controller)
     );
-    router.post("/accept", this.controller.acceptRequest.bind(this.controller));
+    router.post("/accept", this.checkJwt, this.controller.acceptRequest.bind(this.controller));
     router.post(
       "/status",
       this.checkJwt,
