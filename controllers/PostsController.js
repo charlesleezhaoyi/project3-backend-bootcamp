@@ -126,6 +126,7 @@ class PostsController {
       return res.send(newPost);
     } catch (err) {
       await t.rollback();
+      console.log(err.message);
       return res.status(400).send(err.message);
     }
   }
@@ -180,11 +181,11 @@ class PostsController {
         postId,
         userEmail
       );
-      if (like === isUserLikedPost) {
-        throw new Error(
-          `User already ${like ? "liked" : "unliked"} this post before`
-        );
-      }
+      // if (like === isUserLikedPost) {
+      //   throw new Error(
+      //     `User already ${like ? "liked" : "unliked"} this post before`
+      //   );
+      // }
       if (isUserLikedPost) {
         await post.removeLiker(user);
       } else {

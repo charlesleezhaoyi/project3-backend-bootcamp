@@ -39,6 +39,7 @@ class CommentsController {
       if (!postData) {
         throw new Error("No Such Post Found.");
       }
+      console.log(req.body);
       const user = await this.user.findOne({ where: { email: userEmail } });
       const comment = await postData.createComment({
         commenterId: user.id,
@@ -46,6 +47,7 @@ class CommentsController {
       });
       return res.json({ user, comment });
     } catch (err) {
+      console.log(err.message);
       return res.status(400).send(err.message);
     }
   }

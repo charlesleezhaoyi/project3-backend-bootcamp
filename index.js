@@ -8,7 +8,6 @@ const { auth } = require("express-oauth2-jwt-bearer");
 const checkJwt = auth({
   audience: "https://bookswap/api",
   issuerBaseURL: "https://dev-8fku0sjpc2omyvc4.us.auth0.com/",
-  tokenSigningAlg: "RS256",
 });
 
 // const checkScopes = requiredScopes("read:messages");

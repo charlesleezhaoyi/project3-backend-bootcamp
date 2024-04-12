@@ -8,9 +8,14 @@ class CommentsRouter {
   }
 
   routes() {
-    router.get("/:postId", this.controller.getComments.bind(this.controller));
+    router.get(
+      "/:postId",
+      this.checkJwt,
+      this.controller.getComments.bind(this.controller)
+    );
     router.post(
       "/:postId",
+      this.checkJwt,
       this.controller.createComment.bind(this.controller)
     );
     return router;

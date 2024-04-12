@@ -23,7 +23,6 @@ class BooksRouter {
     );
     router.get(
       "/search",
-      this.checkJwt,
       this.controller.getRelatedBooks.bind(this.controller)
     );
     router.get(
@@ -33,7 +32,6 @@ class BooksRouter {
     );
     router.get(
       "/category/:category",
-      this.checkJwt,
       this.controller.getBookByCategory.bind(this.controller)
     );
 

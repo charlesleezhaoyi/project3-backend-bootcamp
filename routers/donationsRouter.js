@@ -10,6 +10,7 @@ class DonationsRouter {
   routes() {
     router.get(
       "/user/:email",
+      this.checkJwt,
       this.controller.getDonationsOnUser.bind(this.controller)
     );
     router.get(
