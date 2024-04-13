@@ -37,27 +37,11 @@ const { user, category, book, comment, post, request, donation } = db;
 // Initializing Controllers
 // Controllers with checkJwt
 const userController = new UsersController(user, category);
-const postsController = new PostsController(db, checkJwt);
-const bookController = new BooksController(db, checkJwt);
-const requestController = new RequestsController(
-  request,
-  donation,
-  book,
-  user,
-  checkJwt
-);
-const commentsController = new CommentsController(
-  comment,
-  post,
-  user,
-  checkJwt
-);
-const donationsController = new DonationsController(
-  donation,
-  user,
-  book,
-  checkJwt
-);
+const postsController = new PostsController(db);
+const bookController = new BooksController(db);
+const requestController = new RequestsController(request, donation, book, user);
+const commentsController = new CommentsController(comment, post, user);
+const donationsController = new DonationsController(donation, user, book);
 
 //Controllers without checkJwt
 const categoriesController = new CategoriesController(category, db, book);
