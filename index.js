@@ -6,8 +6,8 @@ require("dotenv").config();
 const { auth } = require("express-oauth2-jwt-bearer");
 
 const checkJwt = auth({
-  audience: "https://bookswap/api",
-  issuerBaseURL: "https://dev-8fku0sjpc2omyvc4.us.auth0.com/",
+  audience: process.env.DB_AUTH0_AUDIENCE,
+  issuerBaseURL: process.env.DB_AUTH0_ISSUERBASEURL,
 });
 
 // const checkScopes = requiredScopes("read:messages");
