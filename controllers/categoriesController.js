@@ -1,20 +1,16 @@
-const BaseController = require("./baseController");
-
-class CategoriesController extends BaseController {
+class CategoriesController {
   constructor(model, db) {
-    super(model);
+    this.model = model;
     this.post = db.post;
     this.like = db.like;
     this.comment = db.comment;
     this.sequelize = db.sequelize;
   }
 
-  async getCategories(req, res) {
+  async getAll(req, res) {
     try {
-      const categories = await this.model.findAll({
-        attributes: ["id", "name"],
-      });
-      return res.json(categories);
+      const output = await this.model.findAll();
+      return res.json(output);
     } catch (err) {
       return res.status(400).json({ error: true, msg: err });
     }
