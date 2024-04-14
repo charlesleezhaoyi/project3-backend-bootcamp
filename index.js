@@ -10,8 +10,6 @@ const checkJwt = auth({
   issuerBaseURL: process.env.DB_AUTH0_ISSUERBASEURL,
 });
 
-// const checkScopes = requiredScopes("read:messages");
-
 // importing Routers
 const UsersRouter = require("./routers/usersRouter");
 const PostsRouter = require("./routers/PostsRouter");
@@ -37,35 +35,18 @@ const { user, category, book, comment, post, request, donation } = db;
 // Initializing Controllers
 // Controllers with checkJwt
 const userController = new UsersController(user, category);
-const postsController = new PostsController(db, checkJwt);
-const bookController = new BooksController(db, checkJwt);
-const requestController = new RequestsController(
-  request,
-  donation,
-  book,
-  user,
-  checkJwt
-);
-const commentsController = new CommentsController(
-  comment,
-  post,
-  user,
-  checkJwt
-);
-const donationsController = new DonationsController(
-  donation,
-  user,
-  book,
-  checkJwt
-);
-
-//Controllers without checkJwt
+const postsController = new PostsController(db);
+const bookController = new BooksController(db);
+const requestController = new RequestsController(request, donation, book, user);
+const commentsController = new CommentsController(comment, post, user);
+const donationsController = new DonationsController(donation, user, book);
 const categoriesController = new CategoriesController(category, db, book);
 
 // Initializing Routers
-const usersRouter = new UsersRouter(userController);
-const postsRouter = new PostsRouter(postsController, checkJwt);
+
 const categoriesRouter = new CategoriesRouter(categoriesController);
+const usersRouter = new UsersRouter(userController, checkJwt);
+const postsRouter = new PostsRouter(postsController, checkJwt);
 const booksRouter = new BooksRouter(bookController, upload, checkJwt);
 const commentsRouter = new CommentsRouter(commentsController, checkJwt);
 const requestsRouter = new RequestsRouter(requestController, checkJwt);
