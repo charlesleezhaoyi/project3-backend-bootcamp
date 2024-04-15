@@ -1,8 +1,10 @@
 const { Op } = require("sequelize");
 const fs = require("fs");
+const ValidationChecker = require("./ValidationChecker");
 
-class BooksController {
+class BooksController extends ValidationChecker {
   constructor(db) {
+    super();
     this.bookModel = db.book;
     this.photoModel = db.photo;
     this.categoryModel = db.category;
@@ -14,6 +16,8 @@ class BooksController {
   async insertBook(req, res) {
     const { categories, email, ...data } = JSON.parse(req.body.data);
     try {
+      this.checkStringFromBody(email, "email");
+      this.checkArray(categories, "categories");
       const t = await this.sequelize.transaction();
       const book = await this.bookModel.create(data, { transaction: t });
       for (const [index, { path }] of req.files.entries()) {
@@ -72,6 +76,7 @@ class BooksController {
   async getBookByCategory(req, res) {
     const { category } = req.params;
     try {
+      this.checkStringFromParams(category, "category");
       const selectedBooks = await this.bookModel.findAll({
         include: [
           { model: this.categoryModel, where: { name: category } },
@@ -89,12 +94,10 @@ class BooksController {
   }
 
   async getBook(req, res) {
-    const { id } = req.params;
+    const { bookId } = req.params;
     try {
-      if (isNaN(Number(postId))) {
-        throw new Error("Wrong Type of id");
-      }
-      const book = await this.bookModel.findByPk(id, {
+      this.checkNumber(bookId, "bookId");
+      const book = await this.bookModel.findByPk(bookId, {
         include: [
           this.photoModel,
           this.categoryModel,
@@ -113,6 +116,7 @@ class BooksController {
   async searchBooks(req, res) {
     const info = req.query.q;
     try {
+      this.checkStringFromBody(info, "q (search term)");
       const data = await this.bookModel.findAll({
         where: {
           [Op.or]: [

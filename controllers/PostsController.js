@@ -1,5 +1,7 @@
-class PostsController {
+const ValidationChecker = require("./ValidationChecker");
+class PostsController extends ValidationChecker {
   constructor(db) {
+    super();
     this.postModel = db.post;
     this.userModel = db.user;
     this.categoryModel = db.category;
@@ -11,9 +13,7 @@ class PostsController {
   async getOne(req, res) {
     const { postId } = req.params;
     try {
-      if (isNaN(Number(postId))) {
-        throw new Error("Wrong Type of postId");
-      }
+      this.checkNumber(postId, "postId");
       const data = await this.postModel.findByPk(postId, {
         include: [
           "author",
@@ -36,11 +36,12 @@ class PostsController {
     let { sortBy, limit, page } = req.query;
     const sortByList = ["newestPost", "newestComment", "popular"];
     try {
-      if (!!limit && isNaN(Number(limit))) {
-        throw new Error("Wrong type of limit");
+      this.checkStringFromParams(category, "category");
+      if (limit) {
+        this.checkNumber(limit, "limit");
       }
-      if (!!page && isNaN(Number(page))) {
-        throw new Error("Wrong type of page");
+      if (page) {
+        this.checkNumber(page, "page");
       }
       if (!!page && !limit) {
         throw new Error("Must have limit for page");
@@ -107,23 +108,16 @@ class PostsController {
     const { categories, authorEmail, ...data } = req.body;
     const t = await this.sequelize.transaction();
     try {
-      if (!data.title || !data.content) {
-        throw new Error("Must have title/content data");
-      }
-      if (typeof data.title !== "string" || typeof data.content !== "string") {
-        throw new Error("Wrong Type of title/content");
-      }
-      if (!data.title.length || !data.content.length) {
-        throw new Error("Must have content for title/content");
-      }
+      this.checkStringFromBody(authorEmail, "authorEmail");
+      this.checkStringFromBody(data.title, "title");
+      this.checkStringFromBody(data.content, "content");
+      this.checkArray(categories, "categories");
       const author = await this.userModel.findOne({
         where: { email: authorEmail },
       });
       data.authorId = author.id;
       const newPost = await this.postModel.create(data, { transaction: t });
-      if (categories) {
-        await this.addingCategoriesToPost(categories, newPost, t);
-      }
+      await this.addingCategoriesToPost(categories, newPost, t);
       await t.commit();
       return res.send(newPost);
     } catch (error) {
@@ -147,9 +141,6 @@ class PostsController {
   }
 
   async checkIsUserLikedPost(postId, userEmail) {
-    if (isNaN(Number(postId))) {
-      throw new Error("Wrong Type of postId");
-    }
     const post = await this.postModel.findByPk(postId);
     if (!post) {
       throw new Error("No Such Post Found");
@@ -165,6 +156,8 @@ class PostsController {
   async getIsUserLikedPost(req, res) {
     const { postId, userEmail } = req.params;
     try {
+      this.checkNumber(postId, "postId");
+      this.checkStringFromParams(userEmail, "userEmail");
       const [isUserLikedPost] = await this.checkIsUserLikedPost(
         postId,
         userEmail
@@ -178,6 +171,8 @@ class PostsController {
   async toggleLike(req, res) {
     const { postId, userEmail, like } = req.body;
     try {
+      this.checkNumber(postId, "postId");
+      this.checkStringFromBody(userEmail, "userEmail");
       const [isUserLikedPost, post, user] = await this.checkIsUserLikedPost(
         postId,
         userEmail

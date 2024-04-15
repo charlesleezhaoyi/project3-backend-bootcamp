@@ -1,5 +1,8 @@
-class DonationsController {
+const ValidationChecker = require("./ValidationChecker");
+
+class DonationsController extends ValidationChecker {
   constructor(db) {
+    super();
     this.donationModel = db.donation;
     this.userModel = db.user;
     this.bookModel = db.book;
@@ -8,9 +11,7 @@ class DonationsController {
   async getDonorEmail(req, res) {
     const { bookId } = req.params;
     try {
-      if (isNaN(Number(bookId))) {
-        throw new Error("Wrong Type of postId");
-      }
+      this.checkNumber(bookId, "bookId");
       const donation = await this.donationModel.findOne({
         where: {
           bookId: bookId,
@@ -27,6 +28,7 @@ class DonationsController {
   async getDonationsOnUser(req, res) {
     const { email } = req.params;
     try {
+      this.checkStringFromParams(email, "email");
       const user = await this.userModel.findOne({
         where: {
           email: email,

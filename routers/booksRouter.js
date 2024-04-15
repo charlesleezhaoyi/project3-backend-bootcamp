@@ -10,7 +10,7 @@ class BooksRouter {
   routes() {
     router.get("/", this.controller.getAllBooks.bind(this.controller));
     router.get("/search", this.controller.searchBooks.bind(this.controller));
-    router.get("/:id", this.controller.getBook.bind(this.controller));
+    router.get("/:bookId", this.controller.getBook.bind(this.controller));
     router.get(
       "/category/:category",
       this.controller.getBookByCategory.bind(this.controller)

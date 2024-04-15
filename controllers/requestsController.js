@@ -8,9 +8,11 @@ const mailjet = Mailjet.apiConnect(
   process.env.MAILJET_SECRET_KEY
 );
 const mailjetRequest = mailjet.post("send", { version: "v3.1" });
+const ValidationChecker = require("./ValidationChecker");
 
-class RequestsController {
+class RequestsController extends ValidationChecker {
   constructor(db) {
+    super();
     this.requestModel = db.request;
     this.donationModel = db.donation;
     this.bookModel = db.book;
@@ -22,12 +24,9 @@ class RequestsController {
     const { beneId, bookId } = req.body;
 
     try {
-      if (isNaN(Number(beneId))) {
-        throw new Error("Wrong Type of beneId");
-      }
-      if (isNaN(Number(bookId))) {
-        throw new Error("Wrong Type of bookId");
-      }
+      this.checkNumber(beneId, "beneId");
+      this.checkNumber(bookId, "bookId");
+
       const t = await this.sequelize.transaction();
       const recipient = await this.userModel.findOne({
         where: { id: beneId },
@@ -86,9 +85,9 @@ class RequestsController {
   async insertRequest(req, res) {
     const { bookId, content, email } = req.body;
     try {
-      if (isNaN(Number(bookId))) {
-        throw new Error("Wrong Type of bookId");
-      }
+      this.checkNumber(bookId, "bookId");
+      this.checkStringFromBody(content, "content");
+      this.checkStringFromBody(email, "email");
       const donation = await this.donationModel.findOne({
         where: {
           bookId: bookId,
@@ -111,17 +110,19 @@ class RequestsController {
 
   async changeRequestStatus(req, res) {
     const { beneId, donationId, status } = req.body;
+
     try {
-      if (isNaN(Number(beneId))) {
-        throw new Error("Wrong Type of beneId");
-      }
-      if (isNaN(Number(donationId))) {
-        throw new Error("Wrong Type of donationId");
+      this.checkNumber(beneId, "beneId");
+      this.checkArray(donationId, "donationId");
+      if (!["rejected", "cancelled", "collected"].includes(status)) {
+        throw new Error("Wrong value of status");
       }
       await this.requestModel.update(
         { status: status },
         {
-          where: { [Op.and]: [{ beneId: beneId }, { donationId: donationId }] },
+          where: {
+            [Op.and]: [{ beneId: beneId }, { donationId: donationId }],
+          },
         }
       );
       return res.json("Okay");
@@ -133,9 +134,7 @@ class RequestsController {
   async getAllRequestOnBook(req, res) {
     const { bookId } = req.params;
     try {
-      if (isNaN(Number(bookId))) {
-        throw new Error("Wrong Type of bookId");
-      }
+      this.checkNumber(bookId, "bookId");
       const donation = await this.donationModel.findOne({
         where: {
           bookId: bookId,
@@ -154,6 +153,7 @@ class RequestsController {
   async getAllRequestOnUser(req, res) {
     const { email } = req.params;
     try {
+      this.checkStringFromParams(email, "email");
       const user = await this.userModel.findOne({
         where: {
           email: email,

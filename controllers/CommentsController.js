@@ -1,5 +1,8 @@
-class CommentsController {
+const ValidationChecker = require("./ValidationChecker");
+
+class CommentsController extends ValidationChecker {
   constructor(db) {
+    super();
     this.commentModel = db.comment;
     this.postModel = db.post;
     this.userModel = db.user;
@@ -8,9 +11,7 @@ class CommentsController {
   async getComments(req, res) {
     const { postId } = req.params;
     try {
-      if (isNaN(Number(postId))) {
-        throw new Error("Wrong Type of postId");
-      }
+      this.checkNumber(postId, "postId");
       const comments = await this.commentModel.findAll({
         where: { commentedPostId: postId },
         include: "commenter",
@@ -25,16 +26,10 @@ class CommentsController {
   async createComment(req, res) {
     const { postId } = req.params;
     try {
-      if (isNaN(Number(postId))) {
-        throw new Error("Wrong Type of postId");
-      }
+      this.checkNumber(postId, "postId");
       const { userEmail, content } = req.body;
-      if (typeof content !== "string") {
-        throw new Error("Wrong Type of content");
-      }
-      if (!content.length) {
-        throw new Error("Must have content for content");
-      }
+      this.checkStringFromBody(userEmail, "userEmail");
+      this.checkStringFromBody(content, "content");
       const postData = await this.postModel.findByPk(postId);
       if (!postData) {
         throw new Error("No Such Post Found.");
