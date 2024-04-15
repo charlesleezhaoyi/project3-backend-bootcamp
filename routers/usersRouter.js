@@ -12,11 +12,11 @@ class UsersRouter {
       "/",
       this.controller.insertUnverifiedUser.bind(this.controller)
     );
-    router.put("/", this.controller.updateVerifiedUser.bind(this.controller));
     router.post(
       "/addCategory",
       this.controller.addCategoryToUser.bind(this.controller)
     );
+    router.put("/", this.controller.updateVerifiedUser.bind(this.controller));
     return router;
   }
 }

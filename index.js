@@ -10,8 +10,6 @@ const checkJwt = auth({
   issuerBaseURL: process.env.DB_AUTH0_ISSUERBASEURL,
 });
 
-// const checkScopes = requiredScopes("read:messages");
-
 // importing Routers
 const UsersRouter = require("./routers/usersRouter");
 const PostsRouter = require("./routers/PostsRouter");
@@ -32,44 +30,25 @@ const DonationsController = require("./controllers/donationsController");
 
 //importing DB
 const db = require("./db/models/index");
-const { user, category, book, comment, post, request, donation } = db;
 
 // Initializing Controllers
-// Controllers with checkJwt
-const userController = new UsersController(user, category);
-const postsController = new PostsController(db, checkJwt);
-const bookController = new BooksController(db, checkJwt);
-const requestController = new RequestsController(
-  request,
-  donation,
-  book,
-  user,
-  checkJwt
-);
-const commentsController = new CommentsController(
-  comment,
-  post,
-  user,
-  checkJwt
-);
-const donationsController = new DonationsController(
-  donation,
-  user,
-  book,
-  checkJwt
-);
-
-//Controllers without checkJwt
-const categoriesController = new CategoriesController(category, db, book);
+const userController = new UsersController(db);
+const postsController = new PostsController(db);
+const bookController = new BooksController(db);
+const requestController = new RequestsController(db);
+const commentsController = new CommentsController(db);
+const donationsController = new DonationsController(db);
+const categoriesController = new CategoriesController(db);
 
 // Initializing Routers
-const usersRouter = new UsersRouter(userController);
-const postsRouter = new PostsRouter(postsController, checkJwt);
+
 const categoriesRouter = new CategoriesRouter(categoriesController);
-const booksRouter = new BooksRouter(bookController, upload, checkJwt);
-const commentsRouter = new CommentsRouter(commentsController, checkJwt);
-const requestsRouter = new RequestsRouter(requestController, checkJwt);
-const donationsRouter = new DonationsRouter(donationsController, checkJwt);
+const usersRouter = new UsersRouter(userController);
+const postsRouter = new PostsRouter(postsController);
+const booksRouter = new BooksRouter(bookController, upload);
+const commentsRouter = new CommentsRouter(commentsController);
+const requestsRouter = new RequestsRouter(requestController);
+const donationsRouter = new DonationsRouter(donationsController);
 
 const PORT = 3000;
 const app = express();
@@ -81,14 +60,13 @@ app.use(cors());
 app.use(express.json());
 
 // Enable and use usersRouter
-app.use("/users", usersRouter.routes());
-app.use("/posts", postsRouter.routes());
-app.use("/categories", categoriesRouter.routes());
-app.use("/books", booksRouter.routes());
-app.use("/comments", commentsRouter.routes());
-app.use("/categories", categoriesRouter.routes());
-app.use("/requests", requestsRouter.routes());
-app.use("/donations", donationsRouter.routes());
+app.use("/categories", checkJwt, categoriesRouter.routes());
+app.use("/users", checkJwt, usersRouter.routes());
+app.use("/posts", checkJwt, postsRouter.routes());
+app.use("/books", checkJwt, booksRouter.routes());
+app.use("/comments", checkJwt, commentsRouter.routes());
+app.use("/requests", checkJwt, requestsRouter.routes());
+app.use("/donations", checkJwt, donationsRouter.routes());
 
 app.listen(PORT, () => {
   console.log(`Express app listening on port ${PORT}!`);

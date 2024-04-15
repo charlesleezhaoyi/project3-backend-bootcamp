@@ -1,39 +1,41 @@
-class UsersController {
-  constructor(model, category) {
-    this.model = model;
-    this.category = category;
+const ValidationChecker = require("./ValidationChecker");
+class UsersController extends ValidationChecker {
+  constructor(db) {
+    super();
+    this.userModel = db.user;
+    this.categoryModel = db.category;
   }
 
   async getUserByEmail(req, res) {
     const { email } = req.params;
     try {
-      const data = await this.model.findOne({ where: { email: email } });
+      this.checkStringFromParams(email, "email");
+      const data = await this.userModel.findOne({ where: { email: email } });
       return res.json(data);
-    } catch (err) {
+    } catch (error) {
       return res.status(400).json({
         error: true,
-        msg: err,
+        msg: error,
       });
     }
   }
 
   async insertUnverifiedUser(req, res) {
     const { email } = req.body;
-
     try {
-      await this.model.findOrCreate({
+      this.checkStringFromBody(email, "email");
+      await this.userModel.findOrCreate({
         where: {
           email: email,
         },
       });
-
-      return res.status(200).json({
+      return res.json({
         message: "User created",
       });
-    } catch (err) {
+    } catch (error) {
       return res.status(400).json({
         error: true,
-        msg: err,
+        msg: error,
       });
     }
   }
@@ -43,61 +45,45 @@ class UsersController {
       req.body;
 
     try {
-      const user = await this.model.findOne({
+      this.checkStringFromBody(email, "email");
+      this.checkStringFromBody(firstName, "firstName");
+      this.checkStringFromBody(lastName, "lastName");
+
+      const user = await this.userModel.findOne({
         where: {
           email: email,
         },
       });
-
-      if (user) {
-        await this.model.update(
-          { firstName, lastName, phone, smsConsent, emailConsent },
-          { where: { email: email } }
-        );
-        console.log(req.body);
-
-        return res.status(200).send({ message: "User updated successfully." });
-      } else {
+      if (!user) {
         return res.status(404).send({ message: "User not found." });
       }
+      await this.userModel.update(
+        { firstName, lastName, phone, smsConsent, emailConsent },
+        { where: { email: email } }
+      );
+      return res.json({ message: "User updated successfully." });
     } catch (error) {
-      return res
-        .status(500)
-        .send({ message: "Error updating user.", error: error.message });
+      return res.status(400).json({ error: true, msg: error });
     }
   }
 
   async addCategoryToUser(req, res) {
     const { userId, categoryId } = req.body;
-
     try {
-      const user = await this.model.findOne({
-        where: {
-          id: userId,
-        },
-      });
-
-      console.log(userId);
-      console.log(user);
-
-      if (user) {
-        const categoryInstance = await this.category.findByPk(categoryId);
-
-        if (categoryInstance) {
-          await user.addCategory(categoryInstance);
-          return res.status(200).send({ message: "Category added to user." });
-        } else {
-          return res.status(404).send({ message: "Category not found." });
-        }
-      } else {
+      this.checkNumber(userId, "userId");
+      this.checkNumber(categoryId, "categoryId");
+      const user = await this.userModel.findByPk(userId);
+      if (!user) {
         return res.status(404).send({ message: "User not found." });
       }
+      const categoryInstance = await this.categoryModel.findByPk(categoryId);
+      if (!categoryInstance) {
+        return res.status(404).send({ message: "Category not found." });
+      }
+      await user.addCategory(categoryInstance);
+      return res.json({ message: "Category added to user." });
     } catch (error) {
-      console.log(error);
-      return res.status(500).send({
-        message: "Error adding category to user.",
-        error: error.message,
-      });
+      return res.status(400).json({ error: true, msg: error });
     }
   }
 }

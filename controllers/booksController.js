@@ -1,9 +1,11 @@
 const { Op } = require("sequelize");
 const fs = require("fs");
+const ValidationChecker = require("./ValidationChecker");
 
-class BooksController {
+class BooksController extends ValidationChecker {
   constructor(db) {
-    this.model = db.book;
+    super();
+    this.bookModel = db.book;
     this.photoModel = db.photo;
     this.categoryModel = db.category;
     this.donationModel = db.donation;
@@ -13,9 +15,11 @@ class BooksController {
 
   async insertBook(req, res) {
     const { categories, email, ...data } = JSON.parse(req.body.data);
-    const t = await this.sequelize.transaction();
     try {
-      const book = await this.model.create(data, { transaction: t });
+      this.checkStringFromBody(email, "email");
+      this.checkArray(categories, "categories");
+      const t = await this.sequelize.transaction();
+      const book = await this.bookModel.create(data, { transaction: t });
       for (const [index, { path }] of req.files.entries()) {
         const photoBinaryData = fs.readFileSync(path);
         await this.photoModel.create(
@@ -48,15 +52,15 @@ class BooksController {
 
       await t.commit();
       return res.json(book);
-    } catch (err) {
+    } catch (error) {
       await t.rollback();
-      return res.status(400).json({ error: true, msg: err });
+      return res.status(400).json({ error: true, msg: error });
     }
   }
 
   async getAllBooks(req, res) {
     try {
-      const books = await this.model.findAll({
+      const books = await this.bookModel.findAll({
         include: {
           model: this.photoModel,
           where: { index: 0 },
@@ -64,15 +68,16 @@ class BooksController {
         },
       });
       return res.json(books);
-    } catch (err) {
-      return res.status(400).json({ error: true, msg: err });
+    } catch (error) {
+      return res.status(400).json({ error: true, msg: error });
     }
   }
 
   async getBookByCategory(req, res) {
     const { category } = req.params;
     try {
-      const selectedBooks = await this.model.findAll({
+      this.checkStringFromParams(category, "category");
+      const selectedBooks = await this.bookModel.findAll({
         include: [
           { model: this.categoryModel, where: { name: category } },
           {
@@ -83,15 +88,16 @@ class BooksController {
         ],
       });
       return res.json(selectedBooks);
-    } catch (err) {
-      return res.status(400).json({ error: true, msg: err });
+    } catch (error) {
+      return res.status(400).json({ error: true, msg: error });
     }
   }
 
   async getBook(req, res) {
-    const { id } = req.params;
+    const { bookId } = req.params;
     try {
-      const book = await this.model.findByPk(id, {
+      this.checkNumber(bookId, "bookId");
+      const book = await this.bookModel.findByPk(bookId, {
         include: [
           this.photoModel,
           this.categoryModel,
@@ -102,16 +108,16 @@ class BooksController {
         ],
       });
       return res.json(book);
-    } catch (err) {
-      return res.status(400).json({ error: true, msg: err });
+    } catch (error) {
+      return res.status(400).json({ error: true, msg: error });
     }
   }
 
-  async getRelatedBooks(req, res) {
-    // const { searchTerm } = req.params;
+  async searchBooks(req, res) {
     const info = req.query.q;
     try {
-      const data = await this.model.findAll({
+      this.checkStringFromBody(info, "q (search term)");
+      const data = await this.bookModel.findAll({
         where: {
           [Op.or]: [
             { title: { [Op.iLike]: `%${info}%` } },
@@ -120,18 +126,10 @@ class BooksController {
         },
         include: this.photoModel,
       });
-      console.log(data);
 
-      // const books = data.map((book) => book.dataValues);
-      // console.log(books);
       return res.json(data);
-      // res.status(200).json(data);
     } catch (error) {
-      console.log(error);
-      res.status(500).json({
-        message: "An error occurred while fetching the book data.",
-        error: error.message,
-      });
+      return res.status(400).json({ error: true, msg: error });
     }
   }
 }
