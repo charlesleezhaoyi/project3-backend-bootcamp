@@ -17,7 +17,7 @@ class RequestsRouter {
     );
     router.post("/", this.controller.insertRequest.bind(this.controller));
     router.post("/accept", this.controller.acceptRequest.bind(this.controller));
-    router.post(
+    router.put(
       "/status",
       this.controller.changeRequestStatus.bind(this.controller)
     );

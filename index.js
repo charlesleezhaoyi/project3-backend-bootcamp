@@ -60,12 +60,11 @@ app.use(cors());
 app.use(express.json());
 
 // Enable and use usersRouter
-app.use("/categories", categoriesRouter.routes());
+app.use("/categories", checkJwt, categoriesRouter.routes());
 app.use("/users", checkJwt, usersRouter.routes());
 app.use("/posts", checkJwt, postsRouter.routes());
 app.use("/books", checkJwt, booksRouter.routes());
 app.use("/comments", checkJwt, commentsRouter.routes());
-app.use("/categories", checkJwt, categoriesRouter.routes());
 app.use("/requests", checkJwt, requestsRouter.routes());
 app.use("/donations", checkJwt, donationsRouter.routes());
 
