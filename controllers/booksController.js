@@ -13,8 +13,8 @@ class BooksController {
 
   async insertBook(req, res) {
     const { categories, email, ...data } = JSON.parse(req.body.data);
-    const t = await this.sequelize.transaction();
     try {
+      const t = await this.sequelize.transaction();
       const book = await this.bookModel.create(data, { transaction: t });
       for (const [index, { path }] of req.files.entries()) {
         const photoBinaryData = fs.readFileSync(path);
@@ -108,7 +108,6 @@ class BooksController {
   }
 
   async searchBooks(req, res) {
-    // const { searchTerm } = req.params;
     const info = req.query.q;
     try {
       const data = await this.bookModel.findAll({
@@ -120,18 +119,10 @@ class BooksController {
         },
         include: this.photoModel,
       });
-      console.log(data);
 
-      // const books = data.map((book) => book.dataValues);
-      // console.log(books);
       return res.json(data);
-      // res.status(200).json(data);
     } catch (error) {
-      console.log(error);
-      res.status(500).json({
-        message: "An error occurred while fetching the book data.",
-        error: error.message,
-      });
+      return res.status(400).json({ error: true, msg: err });
     }
   }
 }
