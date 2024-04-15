@@ -1,15 +1,15 @@
 class CategoriesController {
-  constructor(model, db) {
-    this.model = model;
-    this.post = db.post;
-    this.like = db.like;
-    this.comment = db.comment;
+  constructor(db) {
+    this.categoryModel = db.category;
+    this.postModel = db.post;
+    this.likeModel = db.like;
+    this.commentModel = db.comment;
     this.sequelize = db.sequelize;
   }
 
   async getAll(req, res) {
     try {
-      const output = await this.model.findAll();
+      const output = await this.categoryModel.findAll();
       return res.json(output);
     } catch (err) {
       return res.status(400).json({ error: true, msg: err });
@@ -31,7 +31,7 @@ class CategoriesController {
         );
       }
       const categoryOption = this.getCategoryOption(sortBy);
-      const categories = await this.model.findAll(categoryOption);
+      const categories = await this.categoryModel.findAll(categoryOption);
       return res.json(categories);
     } catch (error) {
       return res.status(400).send(error.message);
@@ -46,10 +46,10 @@ class CategoriesController {
         break;
       case "popularSection":
         categoryOption.include = {
-          model: this.post,
+          model: this.postModel,
           attributes: [],
           through: { attributes: [] },
-          include: [{ model: this.like, attributes: [] }],
+          include: [{ model: this.likeModel, attributes: [] }],
         };
         categoryOption.group = ["category.id"];
         categoryOption.order = [
@@ -61,19 +61,21 @@ class CategoriesController {
         break;
       case "newestPost":
         categoryOption.include = {
-          model: this.post,
+          model: this.postModel,
           attributes: [],
         };
-        categoryOption.order = [[this.post, "createdAt", "DESC NULLS LAST"]];
+        categoryOption.order = [
+          [this.postModel, "createdAt", "DESC NULLS LAST"],
+        ];
         break;
       case "newestComment":
         categoryOption.include = {
-          model: this.post,
+          model: this.postModel,
           attributes: [],
-          include: [{ model: this.comment, attributes: [] }],
+          include: [{ model: this.commentModel, attributes: [] }],
         };
         categoryOption.order = [
-          [this.post, this.comment, "createdAt", "DESC NULLS LAST"],
+          [this.postModel, this.commentModel, "createdAt", "DESC NULLS LAST"],
         ];
         break;
     }

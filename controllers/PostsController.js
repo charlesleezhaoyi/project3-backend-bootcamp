@@ -1,10 +1,10 @@
 class PostsController {
   constructor(db) {
-    this.post = db.post;
-    this.user = db.user;
-    this.category = db.category;
-    this.comment = db.comment;
-    this.like = db.like;
+    this.postModel = db.post;
+    this.userModel = db.user;
+    this.categoryModel = db.category;
+    this.commentModel = db.comment;
+    this.likeModel = db.like;
     this.sequelize = db.sequelize;
   }
 
@@ -14,14 +14,14 @@ class PostsController {
       if (isNaN(Number(postId))) {
         throw new Error("Wrong Type of postId");
       }
-      const data = await this.post.findByPk(postId, {
+      const data = await this.postModel.findByPk(postId, {
         include: [
           "author",
           "likes",
           "categories",
           {
-            model: this.comment,
-            include: { model: this.user, as: "commenter" },
+            model: this.commentModel,
+            include: { model: this.userModel, as: "commenter" },
           },
         ],
       });
@@ -51,7 +51,7 @@ class PostsController {
         );
       }
       const postsOption = this.getPostsOption(sortBy, limit, page);
-      const categoryInstance = await this.category.findOne({
+      const categoryInstance = await this.categoryModel.findOne({
         where: { name: category },
       });
       if (!categoryInstance) {
@@ -73,7 +73,7 @@ class PostsController {
 
   getPostsOption(sortBy) {
     const postsOption = {
-      include: ["author", { model: this.like, attributes: [] }],
+      include: ["author", { model: this.likeModel, attributes: [] }],
       group: ["post.id", "author.id"],
       attributes: {
         include: [
@@ -90,7 +90,7 @@ class PostsController {
         break;
       case "newestComment":
         postsOption.include.push({
-          model: this.comment,
+          model: this.commentModel,
           attributes: [],
         });
         postsOption.group.push("comments.created_at");
@@ -116,9 +116,11 @@ class PostsController {
       if (!data.title.length || !data.content.length) {
         throw new Error("Must have content for title/content");
       }
-      const author = await this.user.findOne({ where: { email: authorEmail } });
+      const author = await this.userModel.findOne({
+        where: { email: authorEmail },
+      });
       data.authorId = author.id;
-      const newPost = await this.post.create(data, { transaction: t });
+      const newPost = await this.postModel.create(data, { transaction: t });
       if (categories) {
         await this.addingCategoriesToPost(categories, newPost, t);
       }
@@ -134,7 +136,7 @@ class PostsController {
   async addingCategoriesToPost(categories, post, t) {
     const categoryInstances = [];
     for (const category of categories) {
-      const categoryInstance = await this.category.findOne({
+      const categoryInstance = await this.categoryModel.findOne({
         where: { name: category },
       });
       if (!categoryInstance) {
@@ -149,11 +151,11 @@ class PostsController {
     if (isNaN(Number(postId))) {
       throw new Error("Wrong Type of postId");
     }
-    const post = await this.post.findByPk(postId);
+    const post = await this.postModel.findByPk(postId);
     if (!post) {
       throw new Error("No Such Post Found");
     }
-    const user = await this.user.findOne({ where: { email: userEmail } });
+    const user = await this.userModel.findOne({ where: { email: userEmail } });
     if (!post) {
       throw new Error("No Such User Found");
     }

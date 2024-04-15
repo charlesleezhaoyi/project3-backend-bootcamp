@@ -1,8 +1,8 @@
 class CommentsController {
-  constructor(comment, post, user) {
-    this.comment = comment;
-    this.post = post;
-    this.user = user;
+  constructor(db) {
+    this.commentModel = db.comment;
+    this.postModel = db.post;
+    this.userModel = db.user;
   }
 
   async getComments(req, res) {
@@ -11,7 +11,7 @@ class CommentsController {
       if (isNaN(Number(postId))) {
         throw new Error("Wrong Type of postId");
       }
-      const comments = await this.comment.findAll({
+      const comments = await this.commentModel.findAll({
         where: { commentedPostId: postId },
         include: "commenter",
         order: [["createdAt", "ASC"]],
@@ -35,12 +35,14 @@ class CommentsController {
       if (!content.length) {
         throw new Error("Must have content for content");
       }
-      const postData = await this.post.findByPk(postId);
+      const postData = await this.postModel.findByPk(postId);
       if (!postData) {
         throw new Error("No Such Post Found.");
       }
       console.log(req.body);
-      const user = await this.user.findOne({ where: { email: userEmail } });
+      const user = await this.userModel.findOne({
+        where: { email: userEmail },
+      });
       const comment = await postData.createComment({
         commenterId: user.id,
         content,

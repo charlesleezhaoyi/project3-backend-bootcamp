@@ -1,8 +1,8 @@
 class DonationsController {
-  constructor(donationModel, userModel, bookModel) {
-    this.donationModel = donationModel;
-    this.userModel = userModel;
-    this.bookModel = bookModel;
+  constructor(db) {
+    this.donationModel = db.donation;
+    this.userModel = db.user;
+    this.bookModel = db.book;
   }
 
   async getDonorEmail(req, res) {

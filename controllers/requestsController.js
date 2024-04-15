@@ -10,11 +10,11 @@ const mailjet = Mailjet.apiConnect(
 const mailjetRequest = mailjet.post("send", { version: "v3.1" });
 
 class RequestsController {
-  constructor(requestModel, donationModel, bookModel, userModel) {
-    this.requestModel = requestModel;
-    this.donationModel = donationModel;
-    this.bookModel = bookModel;
-    this.userModel = userModel;
+  constructor(db) {
+    this.requestModel = db.request;
+    this.donationModel = db.donation;
+    this.bookModel = db.book;
+    this.userModel = db.user;
   }
 
   async acceptRequest(req, res) {

@@ -1,13 +1,13 @@
 class UsersController {
-  constructor(model, category) {
-    this.model = model;
-    this.category = category;
+  constructor(db) {
+    this.userModel = db.user;
+    this.categoryModel = db.category;
   }
 
   async getUserByEmail(req, res) {
     const { email } = req.params;
     try {
-      const data = await this.model.findOne({ where: { email: email } });
+      const data = await this.userModel.findOne({ where: { email: email } });
       return res.json(data);
     } catch (err) {
       return res.status(400).json({
@@ -21,7 +21,7 @@ class UsersController {
     const { email } = req.body;
 
     try {
-      await this.model.findOrCreate({
+      await this.userModel.findOrCreate({
         where: {
           email: email,
         },
@@ -43,14 +43,14 @@ class UsersController {
       req.body;
 
     try {
-      const user = await this.model.findOne({
+      const user = await this.userModel.findOne({
         where: {
           email: email,
         },
       });
 
       if (user) {
-        await this.model.update(
+        await this.userModel.update(
           { firstName, lastName, phone, smsConsent, emailConsent },
           { where: { email: email } }
         );
@@ -71,7 +71,7 @@ class UsersController {
     const { userId, categoryId } = req.body;
 
     try {
-      const user = await this.model.findOne({
+      const user = await this.userModel.findOne({
         where: {
           id: userId,
         },
@@ -81,7 +81,7 @@ class UsersController {
       console.log(user);
 
       if (user) {
-        const categoryInstance = await this.category.findByPk(categoryId);
+        const categoryInstance = await this.categoryModel.findByPk(categoryId);
 
         if (categoryInstance) {
           await user.addCategory(categoryInstance);

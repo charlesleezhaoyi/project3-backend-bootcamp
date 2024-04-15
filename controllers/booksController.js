@@ -3,7 +3,7 @@ const fs = require("fs");
 
 class BooksController {
   constructor(db) {
-    this.model = db.book;
+    this.bookModel = db.book;
     this.photoModel = db.photo;
     this.categoryModel = db.category;
     this.donationModel = db.donation;
@@ -15,7 +15,7 @@ class BooksController {
     const { categories, email, ...data } = JSON.parse(req.body.data);
     const t = await this.sequelize.transaction();
     try {
-      const book = await this.model.create(data, { transaction: t });
+      const book = await this.bookModel.create(data, { transaction: t });
       for (const [index, { path }] of req.files.entries()) {
         const photoBinaryData = fs.readFileSync(path);
         await this.photoModel.create(
@@ -56,7 +56,7 @@ class BooksController {
 
   async getAllBooks(req, res) {
     try {
-      const books = await this.model.findAll({
+      const books = await this.bookModel.findAll({
         include: {
           model: this.photoModel,
           where: { index: 0 },
@@ -72,7 +72,7 @@ class BooksController {
   async getBookByCategory(req, res) {
     const { category } = req.params;
     try {
-      const selectedBooks = await this.model.findAll({
+      const selectedBooks = await this.bookModel.findAll({
         include: [
           { model: this.categoryModel, where: { name: category } },
           {
@@ -91,7 +91,7 @@ class BooksController {
   async getBook(req, res) {
     const { id } = req.params;
     try {
-      const book = await this.model.findByPk(id, {
+      const book = await this.bookModel.findByPk(id, {
         include: [
           this.photoModel,
           this.categoryModel,
@@ -107,11 +107,11 @@ class BooksController {
     }
   }
 
-  async getRelatedBooks(req, res) {
+  async searchBooks(req, res) {
     // const { searchTerm } = req.params;
     const info = req.query.q;
     try {
-      const data = await this.model.findAll({
+      const data = await this.bookModel.findAll({
         where: {
           [Op.or]: [
             { title: { [Op.iLike]: `%${info}%` } },
