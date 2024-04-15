@@ -18,7 +18,7 @@ class CommentsController {
       });
       return res.json(comments);
     } catch (err) {
-      return res.status(400).send(err.message);
+      return res.status(400).json({ error: true, msg: err });
     }
   }
 
@@ -39,7 +39,6 @@ class CommentsController {
       if (!postData) {
         throw new Error("No Such Post Found.");
       }
-      console.log(req.body);
       const user = await this.userModel.findOne({
         where: { email: userEmail },
       });
@@ -49,8 +48,7 @@ class CommentsController {
       });
       return res.json({ user, comment });
     } catch (err) {
-      console.log(err.message);
-      return res.status(400).send(err.message);
+      return res.status(400).json({ error: true, msg: err });
     }
   }
 }

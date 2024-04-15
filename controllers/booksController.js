@@ -91,6 +91,9 @@ class BooksController {
   async getBook(req, res) {
     const { id } = req.params;
     try {
+      if (isNaN(Number(postId))) {
+        throw new Error("Wrong Type of id");
+      }
       const book = await this.bookModel.findByPk(id, {
         include: [
           this.photoModel,

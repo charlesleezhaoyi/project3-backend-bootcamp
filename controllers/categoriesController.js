@@ -34,7 +34,7 @@ class CategoriesController {
       const categories = await this.categoryModel.findAll(categoryOption);
       return res.json(categories);
     } catch (error) {
-      return res.status(400).send(error.message);
+      return res.status(400).json({ error: true, msg: err });
     }
   }
 
