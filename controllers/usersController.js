@@ -19,15 +19,13 @@ class UsersController {
 
   async insertUnverifiedUser(req, res) {
     const { email } = req.body;
-
     try {
       await this.userModel.findOrCreate({
         where: {
           email: email,
         },
       });
-
-      return res.status(200).json({
+      return res.json({
         message: "User created",
       });
     } catch (error) {
@@ -48,18 +46,14 @@ class UsersController {
           email: email,
         },
       });
-
-      if (user) {
-        await this.userModel.update(
-          { firstName, lastName, phone, smsConsent, emailConsent },
-          { where: { email: email } }
-        );
-        console.log(req.body);
-
-        return res.status(200).send({ message: "User updated successfully." });
-      } else {
+      if (!user) {
         return res.status(404).send({ message: "User not found." });
       }
+      await this.userModel.update(
+        { firstName, lastName, phone, smsConsent, emailConsent },
+        { where: { email: email } }
+      );
+      return res.json({ message: "User updated successfully." });
     } catch (error) {
       return res.status(400).json({ error: true, msg: error });
     }
@@ -67,29 +61,23 @@ class UsersController {
 
   async addCategoryToUser(req, res) {
     const { userId, categoryId } = req.body;
-
     try {
-      const user = await this.userModel.findOne({
-        where: {
-          id: userId,
-        },
-      });
-
-      console.log(userId);
-      console.log(user);
-
-      if (user) {
-        const categoryInstance = await this.categoryModel.findByPk(categoryId);
-
-        if (categoryInstance) {
-          await user.addCategory(categoryInstance);
-          return res.status(200).send({ message: "Category added to user." });
-        } else {
-          return res.status(404).send({ message: "Category not found." });
-        }
-      } else {
+      if (isNaN(Number(userId))) {
+        throw new Error("Wrong Type of userId");
+      }
+      if (isNaN(Number(categoryId))) {
+        throw new Error("Wrong Type of categoryId");
+      }
+      const user = await this.userModel.findByPk(userId);
+      if (!user) {
         return res.status(404).send({ message: "User not found." });
       }
+      const categoryInstance = await this.categoryModel.findByPk(categoryId);
+      if (!categoryInstance) {
+        return res.status(404).send({ message: "Category not found." });
+      }
+      await user.addCategory(categoryInstance);
+      return res.json({ message: "Category added to user." });
     } catch (error) {
       return res.status(400).json({ error: true, msg: error });
     }
