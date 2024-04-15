@@ -22,12 +22,11 @@ class RequestsController extends ValidationChecker {
 
   async acceptRequest(req, res) {
     const { beneId, bookId } = req.body;
-
+    const t = await this.sequelize.transaction();
     try {
       this.checkNumber(beneId, "beneId");
       this.checkNumber(bookId, "bookId");
 
-      const t = await this.sequelize.transaction();
       const recipient = await this.userModel.findOne({
         where: { id: beneId },
       });
