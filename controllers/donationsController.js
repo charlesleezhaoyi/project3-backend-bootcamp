@@ -8,6 +8,9 @@ class DonationsController {
   async getDonorEmail(req, res) {
     const { bookId } = req.params;
     try {
+      if (isNaN(Number(bookId))) {
+        throw new Error("Wrong Type of postId");
+      }
       const donation = await this.donationModel.findOne({
         where: {
           bookId: bookId,
@@ -16,8 +19,8 @@ class DonationsController {
       });
 
       return res.json(donation.donor.email);
-    } catch (err) {
-      return res.status(400).json({ error: true, msg: err });
+    } catch (error) {
+      return res.status(400).json({ error: true, msg: error });
     }
   }
 
@@ -34,8 +37,8 @@ class DonationsController {
         include: [this.bookModel, "requests"],
       });
       return res.json(donations);
-    } catch (err) {
-      return res.status(400).json({ error: true, msg: err });
+    } catch (error) {
+      return res.status(400).json({ error: true, msg: error });
     }
   }
 }

@@ -15,12 +15,20 @@ class RequestsController {
     this.donationModel = db.donation;
     this.bookModel = db.book;
     this.userModel = db.user;
+    this.sequelize = db.sequelize;
   }
 
   async acceptRequest(req, res) {
     const { beneId, bookId } = req.body;
 
     try {
+      if (isNaN(Number(beneId))) {
+        throw new Error("Wrong Type of beneId");
+      }
+      if (isNaN(Number(bookId))) {
+        throw new Error("Wrong Type of bookId");
+      }
+      const t = await this.sequelize.transaction();
       const recipient = await this.userModel.findOne({
         where: { id: beneId },
       });
@@ -29,11 +37,15 @@ class RequestsController {
         include: [{ model: this.userModel, as: "donor" }, this.bookModel],
       });
 
-      await donation.update({ beneId: beneId });
+      await donation.update({ beneId: beneId }, { transaction: t });
 
       await this.requestModel.update(
+        { status: "rejected" },
+        { where: { donationId: donation.id }, transaction: t }
+      );
+      await this.requestModel.update(
         { status: "accepted" },
-        { where: { beneId: beneId } }
+        { where: { beneId: beneId }, transaction: t }
       );
 
       if (recipient.smsConsent && recipient.phone) {
@@ -63,9 +75,11 @@ class RequestsController {
           ],
         });
       }
+      await t.commit();
       return res.json("Request accepted");
-    } catch (err) {
-      return res.status(400).json({ error: true, msg: err });
+    } catch (error) {
+      await t.rollback();
+      return res.status(400).json({ error: true, msg: error });
     }
   }
 
@@ -87,8 +101,8 @@ class RequestsController {
       });
 
       return res.json("Request Created");
-    } catch (err) {
-      return res.status(400).json({ error: true, msg: err });
+    } catch (error) {
+      return res.status(400).json({ error: true, msg: error });
     }
   }
 
@@ -102,8 +116,8 @@ class RequestsController {
         }
       );
       return res.json("Okay");
-    } catch (err) {
-      return res.status(400).json({ error: true, msg: err });
+    } catch (error) {
+      return res.status(400).json({ error: true, msg: error });
     }
   }
 
@@ -120,8 +134,8 @@ class RequestsController {
         include: { model: this.userModel, as: "bene" },
       });
       return res.json(requests);
-    } catch (err) {
-      return res.status(400).json({ error: true, msg: err });
+    } catch (error) {
+      return res.status(400).json({ error: true, msg: error });
     }
   }
 
@@ -141,8 +155,8 @@ class RequestsController {
         },
       });
       return res.json(requests);
-    } catch (err) {
-      return res.status(400).json({ error: true, msg: err });
+    } catch (error) {
+      return res.status(400).json({ error: true, msg: error });
     }
   }
 }

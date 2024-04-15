@@ -17,8 +17,8 @@ class CommentsController {
         order: [["createdAt", "ASC"]],
       });
       return res.json(comments);
-    } catch (err) {
-      return res.status(400).json({ error: true, msg: err });
+    } catch (error) {
+      return res.status(400).json({ error: true, msg: error });
     }
   }
 
@@ -47,8 +47,8 @@ class CommentsController {
         content,
       });
       return res.json({ user, comment });
-    } catch (err) {
-      return res.status(400).json({ error: true, msg: err });
+    } catch (error) {
+      return res.status(400).json({ error: true, msg: error });
     }
   }
 }

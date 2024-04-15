@@ -48,9 +48,9 @@ class BooksController {
 
       await t.commit();
       return res.json(book);
-    } catch (err) {
+    } catch (error) {
       await t.rollback();
-      return res.status(400).json({ error: true, msg: err });
+      return res.status(400).json({ error: true, msg: error });
     }
   }
 
@@ -64,8 +64,8 @@ class BooksController {
         },
       });
       return res.json(books);
-    } catch (err) {
-      return res.status(400).json({ error: true, msg: err });
+    } catch (error) {
+      return res.status(400).json({ error: true, msg: error });
     }
   }
 
@@ -83,8 +83,8 @@ class BooksController {
         ],
       });
       return res.json(selectedBooks);
-    } catch (err) {
-      return res.status(400).json({ error: true, msg: err });
+    } catch (error) {
+      return res.status(400).json({ error: true, msg: error });
     }
   }
 
@@ -105,8 +105,8 @@ class BooksController {
         ],
       });
       return res.json(book);
-    } catch (err) {
-      return res.status(400).json({ error: true, msg: err });
+    } catch (error) {
+      return res.status(400).json({ error: true, msg: error });
     }
   }
 
@@ -125,7 +125,7 @@ class BooksController {
 
       return res.json(data);
     } catch (error) {
-      return res.status(400).json({ error: true, msg: err });
+      return res.status(400).json({ error: true, msg: error });
     }
   }
 }

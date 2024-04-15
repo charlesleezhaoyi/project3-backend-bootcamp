@@ -26,8 +26,8 @@ class PostsController {
         ],
       });
       return res.json(data);
-    } catch (err) {
-      return res.status(400).send(err.message);
+    } catch (error) {
+      return res.status(400).json({ error: true, msg: error });
     }
   }
 
@@ -67,7 +67,7 @@ class PostsController {
       }
       return res.json(posts);
     } catch (error) {
-      return res.status(400).send(error.message);
+      return res.status(400).json({ error: true, msg: error });
     }
   }
 
@@ -126,10 +126,9 @@ class PostsController {
       }
       await t.commit();
       return res.send(newPost);
-    } catch (err) {
+    } catch (error) {
       await t.rollback();
-      console.log(err.message);
-      return res.status(400).send(err.message);
+      return res.status(400).json({ error: true, msg: error });
     }
   }
 
@@ -171,8 +170,8 @@ class PostsController {
         userEmail
       );
       return res.json(isUserLikedPost);
-    } catch (err) {
-      return res.status(400).send(err.message);
+    } catch (error) {
+      return res.status(400).json({ error: true, msg: error });
     }
   }
 
@@ -196,8 +195,8 @@ class PostsController {
         await post.addLiker(user);
       }
       return res.json(!isUserLikedPost);
-    } catch (err) {
-      return res.status(400).send(err.message);
+    } catch (error) {
+      return res.status(400).json({ error: true, msg: error });
     }
   }
 }

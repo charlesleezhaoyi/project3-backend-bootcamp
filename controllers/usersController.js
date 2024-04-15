@@ -9,10 +9,10 @@ class UsersController {
     try {
       const data = await this.userModel.findOne({ where: { email: email } });
       return res.json(data);
-    } catch (err) {
+    } catch (error) {
       return res.status(400).json({
         error: true,
-        msg: err,
+        msg: error,
       });
     }
   }
@@ -30,10 +30,10 @@ class UsersController {
       return res.status(200).json({
         message: "User created",
       });
-    } catch (err) {
+    } catch (error) {
       return res.status(400).json({
         error: true,
-        msg: err,
+        msg: error,
       });
     }
   }
@@ -61,9 +61,7 @@ class UsersController {
         return res.status(404).send({ message: "User not found." });
       }
     } catch (error) {
-      return res
-        .status(500)
-        .send({ message: "Error updating user.", error: error.message });
+      return res.status(400).json({ error: true, msg: error });
     }
   }
 
@@ -93,11 +91,7 @@ class UsersController {
         return res.status(404).send({ message: "User not found." });
       }
     } catch (error) {
-      console.log(error);
-      return res.status(500).send({
-        message: "Error adding category to user.",
-        error: error.message,
-      });
+      return res.status(400).json({ error: true, msg: error });
     }
   }
 }
