@@ -15,10 +15,11 @@ class BooksController extends ValidationChecker {
 
   async insertBook(req, res) {
     const { categories, email, ...data } = JSON.parse(req.body.data);
+    const t = await this.sequelize.transaction();
     try {
       this.checkStringFromBody(email, "email");
       this.checkArray(categories, "categories");
-      const t = await this.sequelize.transaction();
+
       const book = await this.bookModel.create(data, { transaction: t });
       for (const [index, { path }] of req.files.entries()) {
         const photoBinaryData = fs.readFileSync(path);
