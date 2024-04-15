@@ -86,6 +86,9 @@ class RequestsController {
   async insertRequest(req, res) {
     const { bookId, content, email } = req.body;
     try {
+      if (isNaN(Number(bookId))) {
+        throw new Error("Wrong Type of bookId");
+      }
       const donation = await this.donationModel.findOne({
         where: {
           bookId: bookId,
@@ -109,6 +112,12 @@ class RequestsController {
   async changeRequestStatus(req, res) {
     const { beneId, donationId, status } = req.body;
     try {
+      if (isNaN(Number(beneId))) {
+        throw new Error("Wrong Type of beneId");
+      }
+      if (isNaN(Number(donationId))) {
+        throw new Error("Wrong Type of donationId");
+      }
       await this.requestModel.update(
         { status: status },
         {
@@ -124,6 +133,9 @@ class RequestsController {
   async getAllRequestOnBook(req, res) {
     const { bookId } = req.params;
     try {
+      if (isNaN(Number(bookId))) {
+        throw new Error("Wrong Type of bookId");
+      }
       const donation = await this.donationModel.findOne({
         where: {
           bookId: bookId,
