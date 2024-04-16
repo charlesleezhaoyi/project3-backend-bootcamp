@@ -112,10 +112,11 @@ class RequestsController extends ValidationChecker {
 
     try {
       this.checkNumber(beneId, "beneId");
-      this.checkArray(donationId, "donationId");
+      this.checkNumber(donationId, "donationId");
       if (!["rejected", "cancelled", "collected"].includes(status)) {
         throw new Error("Wrong value of status");
       }
+
       await this.requestModel.update(
         { status: status },
         {
